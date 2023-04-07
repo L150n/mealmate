@@ -1,42 +1,48 @@
 from django.shortcuts import render,redirect
 from django.urls import reverse
 from .models import Student
-from .forms import StudentForm
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
+
+
 from django.http import HttpResponse,HttpResponseRedirect
 
 # Create your views here.
 def profile(request):
-    return render(request,'profile.html')
+    user_id = request.session.get('studentid')
+    student = Student.objects.get(studentid=user_id)
+    context = {'student': student} 
+    return render(request,'profile.html',context)
 def login_view(request):
     return render(request,'login.html')
 
+
 def update_profile(request):
-    # check if user is logged in
-    if 'id' in request.session and 'email' in request.session:
-        # retrieve student details from database
-        student = Student.objects.get(studentid=request.session['id'], email=request.session['email'])
-        
-        # if request method is POST, update student details
-        if request.method == 'POST':
-            # retrieve updated details from form
-            student.studentid = request.POST.get('studentid')
-            student.first_name = request.POST.get('first_name')
-            student.last_name = request.POST.get('last_name')
-            student.email = request.POST.get('email')
-            student.mobileno = request.POST.get('mobileno')
-            student.department_name = request.POST.get('department_name')
-            student.semester = request.POST.get('semester')
-            student.dob = request.POST.get('dob')
-            student.gender = request.POST.get('gender')
-            student.address = request.POST.get('address')
-            student.save()  # save changes to database
-            return redirect('profile')  # redirect to profile page after update
-        
-        # if request method is GET, display student details
-        return render(request, 'profile.html', {'student': student})
+    user_id = request.session.get('studentid')
+    student = Student.objects.get(studentid=user_id)
+    # return HttpResponse(request.session.get('studentid'))
+    if not user_id:
+        return redirect('login_view')
     
-    # if user is not logged in, redirect to login page
-    return redirect('login_view')
+    if request.method == 'POST':
+        student.studentid = request.POST.get('studentid')
+        student.first_name = request.POST.get('first_name')
+        student.last_name = request.POST.get('last_name')
+        student.email = request.POST.get('email')
+        student.mobileno = request.POST.get('mobileno')
+        student.department_name = request.POST.get('department_name')
+        student.semester = request.POST.get('semester')
+        student.dob = request.POST.get('dob')
+        student.gender = request.POST.get('gender')
+        student.address = request.POST.get('address')
+        student.save()
+        context = {'student': student} 
+        return render(request,'profile.html',context)
+    
+    return render(request, 'profile.html')
+
+
+
 def loginuser(request):
     if request.method == 'POST':
         useremail = request.POST.get('email')
@@ -45,9 +51,9 @@ def loginuser(request):
             user_details = Student.objects.get(email=useremail, password=password)
             user_id = user_details.studentid
             user_email = user_details.email
-            request.session['id'] = user_id
+            request.session['studentid'] = user_id
             request.session['email'] = user_email
-            return render(request, 'index.html')
+            return render(request, 'index.html',{'studentid':user_id})
         
         else:
             return HttpResponse('wrong user name or password or account does not exist!!')
@@ -88,3 +94,26 @@ def reg(request):
 
     else:
         return render(request, 'login.html')
+
+def update_pass(request):
+    studentid = request.session.get('studentid')
+    if studentid:
+        student = Student.objects.get(studentid=studentid)
+        if request.method == 'POST':
+            old_password = request.POST.get('old_password')
+            new_password = request.POST.get('new_password')
+            confirm_password = request.POST.get('confirm_password')
+            if student.password == old_password:
+                if new_password == confirm_password:
+                    student.password = new_password
+                    student.save()
+                    messages.success(request, 'Password updated successfully!')
+                    context = {'student': student} 
+                    return render(request,'profile.html',context)
+                else:
+                    messages.error(request, 'New password and confirm password did not match!')
+            else:
+                messages.error(request, 'Old password is incorrect!')
+        return render(request, 'update_pass.html')
+    else:
+        return redirect('login')

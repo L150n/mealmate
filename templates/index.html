@@ -40,9 +40,11 @@
                         <a href="team.html" class="nav-item nav-link">Order</a>
                         <a href="menu.html" class="nav-item nav-link">Transaction History</a>
                         <a href="booking.html" class="nav-item nav-link">Feedback</a>
-                        <button type="button" class="btn btn-outline-light">
-                            <i class="fa fa-user mr-1" aria-hidden="true"></i> Logout
-                          </button>
+                        <a href="{% url 'accounts:login' %}">
+                            <button type="button" class="btn btn-outline-light">
+                                <i class="fa fa-user mr-1" aria-hidden="true"></i> Logout
+                              </button>
+                            </a>
                     </div>
                 </div>
             </div>
