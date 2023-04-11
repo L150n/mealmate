@@ -1,9 +1,17 @@
 from django.shortcuts import render,redirect
 from django.urls import reverse
-from .models import Student
+from .models import *
+from io import BytesIO
+from PIL import Image
+import numpy as np
+import cv2
+import base64
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
-
+import face_recognition
+from django.http import JsonResponse
+from django.core.files.base import ContentFile
 
 from django.http import HttpResponse,HttpResponseRedirect
 
@@ -53,14 +61,20 @@ def loginuser(request):
             user_email = user_details.email
             request.session['studentid'] = user_id
             request.session['email'] = user_email
-            return render(request, 'index.html',{'studentid':user_id})
-        
+            return render(request, 'index.html', {'studentid': user_id})
+        elif useremail == 'staff@gmail.com' and password == 'staff':
+            request.session['email'] = useremail
+            return render(request, 'index_staff.html')
         else:
             return HttpResponse('wrong user name or password or account does not exist!!')
     return render(request, 'login.html')
+
    
 def index(request):
     return render(request,'index.html')
+
+def indexstaff(request):
+    return render(request,'index_staff.html')
 
 def reg(request):
     if request.method == 'POST':
@@ -90,7 +104,7 @@ def reg(request):
         student.save()
 
         # Redirect to a success page or login page
-        return HttpResponseRedirect(reverse('success'))
+        return render(request, 'login.html')
 
     else:
         return render(request, 'login.html')
@@ -117,3 +131,41 @@ def update_pass(request):
         return render(request, 'update_pass.html')
     else:
         return redirect('login')
+
+@csrf_exempt
+def process_image(request):
+    if request.method == 'POST':
+        data = request.POST['imagedata']
+        format, imgstr = data.split(';base64,') 
+        ext = format.split('/')[-1] 
+        image_data = imgstr.encode('utf-8')
+        image_data = base64.b64decode(image_data)
+
+        # create an in-memory binary stream from the decoded image data
+        stream = BytesIO(image_data)
+
+        # create a PIL Image object from the binary stream
+        img = Image.open(stream)
+
+        # save the PIL Image object to a bytes object
+        img_bytes = BytesIO()
+        img.save(img_bytes, format=ext)
+
+        # get the student object from the session
+        student_id = request.session.get('studentid')
+        student = Student.objects.get(pk=student_id)
+
+        # check if the student already has an image saved
+        try:
+            old_student_image = StudentImage.objects.get(studentid=student)
+            old_student_image.delete()
+        except StudentImage.DoesNotExist:
+            pass
+
+        # create a new StudentImage object and save it to the database
+        student_image = StudentImage(studentid=student, image=img_bytes.getvalue())
+        student_image.save()
+
+        return HttpResponse('IMG SAVED')
+    else:
+        return HttpResponse('wrong user name or password or account does not exist!!')

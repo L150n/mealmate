@@ -85,9 +85,10 @@ body {
                         <a href="#" class="nav-item nav-link">Order</a>
                         <a href="#" class="nav-item nav-link">Transaction History</a>
                         <a href="#" class="nav-item nav-link">Feedback</a>
+                        <a href="{% url 'accounts:login' %}">
                         <button type="button" class="btn btn-outline-dark">
                             <i class="fa fa-user mr-1" aria-hidden="true"></i> Logout
-                        </button>
+                        </button></a>
                         
                     </div>
                 </div>
@@ -144,12 +145,12 @@ body {
                                 {% csrf_token %}
                             <div class="row">
                                 
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Student ID</label>
-                                            <input type="number" class="form-control" name="studentid"  placeholder="{{ student.studentid }}" value="{{ student.studentid }}">
-                                        </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Student ID</label>
+                                        <input type="number" class="form-control" name="studentid" placeholder="{{ student.studentid }}" value="{{ student.studentid }}" readonly>
                                     </div>
+                                </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label>First Name</label>
@@ -256,10 +257,15 @@ body {
                             <h3 class="mb-4">Facial Recognition Settings</h3>
                             
                                <!-- HTML code for the page -->
-                                    <button id="start-btn">Start Webcam</button>
-                                    <button id="stop-btn" disabled>Stop Webcam</button>
-                                    <video id="video-preview" width="640" height="480"></video>
-                                    <button id="capture-btn" disabled>Capture Image</button>
+                               <button id="start-btn">Start Webcam</button>
+                               <button id="stop-btn" disabled>Stop Webcam</button>
+                               <video id="video-preview" width="640" height="480"></video>
+                               <form id="image-form" action="{% url 'accounts:process_image' %}" method="post">
+                                 {% csrf_token %}
+                                 <input type="hidden" id="imagedata" name="imagedata">
+                                 <button id="capture-btn" disabled>Capture Image</button>
+                               </form>
+                               
                     
                                 
                         </div>
@@ -269,55 +275,56 @@ body {
                 </div>
             </div>
         </section>
-    <script>
-      // JavaScript code to capture an image using webcam
-const startBtn = document.getElementById('start-btn');
-const stopBtn = document.getElementById('stop-btn');
-const video = document.getElementById('video-preview');
-const captureBtn = document.getElementById('capture-btn');
-let stream;
+ 
+                           
+<script>
+    const startBtn = document.getElementById('start-btn');
+    const stopBtn = document.getElementById('stop-btn');
+    const video = document.getElementById('video-preview');
+    const captureBtn = document.getElementById('capture-btn');
+    const imageForm = document.getElementById('image-form');
+    const imageData = document.getElementById('imagedata');
+    let stream;
 
-startBtn.addEventListener('click', () => {
-  navigator.mediaDevices.getUserMedia({ video: true })
-    .then(_stream => {
-      stream = _stream;
-      video.srcObject = stream;
-      video.play();
-      captureBtn.disabled = false;
-      stopBtn.disabled = false;
-      startBtn.disabled = true;
-    })
-    .catch(err => {
-      console.error(`Error: ${err}`);
+    startBtn.addEventListener('click', () => {
+        navigator.mediaDevices.getUserMedia({ video: true })
+        .then(_stream => {
+            stream = _stream;
+            video.srcObject = stream;
+            video.play();
+            captureBtn.disabled = false;
+            stopBtn.disabled = false;
+            startBtn.disabled = true;
+        })
+        .catch(err => {
+            console.error(`Error: ${err}`);
+        });
     });
-});
 
-stopBtn.addEventListener('click', () => {
-  stream.getTracks().forEach(track => track.stop());
-  video.srcObject = null;
-  captureBtn.disabled = true;
-  stopBtn.disabled = true;
-  startBtn.disabled = false;
-});
+    stopBtn.addEventListener('click', () => {
+        stream.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+        captureBtn.disabled = true;
+        stopBtn.disabled = true;
+        startBtn.disabled = false;
+    });
 
-captureBtn.addEventListener('click', () => {
-  const canvas = document.createElement('canvas');
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  canvas.toBlob((blob) => {
-    // Send the blob to the server using AJAX or a form submission
-    // You can also preview the captured image by setting it as the source of an image element
-    const previewImg = document.createElement('img');
-    previewImg.src = URL.createObjectURL(blob);
-    document.body.appendChild(previewImg);
-  }, 'image/jpeg', 0.9);
-});
-
-
-
-    </script>
+    captureBtn.addEventListener('click', () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = () => {
+                imageData.value = reader.result;
+                imageForm.submit();
+            }
+        }, 'image/jpeg', 0.9);
+    });
+</script>
     
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>

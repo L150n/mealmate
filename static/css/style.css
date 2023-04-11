@@ -1963,3 +1963,7 @@ a:focus {
 .footer .copyright p a:hover {
     color: #719a0a;
 }
+
+.card-columns {
+    column-count: 3;
+}

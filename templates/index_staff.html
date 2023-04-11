@@ -1,4 +1,5 @@
 {%load static%}
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -36,15 +37,17 @@
 
                 <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
                     <div class="navbar-nav ml-auto">
-                        <a href="index.html" class="nav-item nav-link active">Home</a>
-                        <a href="about.html" class="nav-item nav-link">Menu</a>
+                        <a href="{% url 'staff:indexstaff'  %}"  class="nav-item nav-link active">Home</a>
+                        <a href="{% url 'staff:menushow' %}" class="nav-item nav-link">Menu</a>
                         <a href="feature.html" class="nav-item nav-link">Order</a>
                         <a href="team.html" class="nav-item nav-link">Order History</a>
                         <a href="menu.html" class="nav-item nav-link">Statistics</a>
                         <a href="booking.html" class="nav-item nav-link">Reviews</a>
-                        <button type="button" class="btn btn-outline-light">
-                            <i class="fa fa-user mr-1" aria-hidden="true"></i> Logout
-                          </button>
+                        <a href="{% url 'accounts:login' %}">
+                            <button type="button" class="btn btn-outline-light">
+                                <i class="fa fa-user mr-1" aria-hidden="true"></i> Logout
+                              </button>
+                            </a>
                     </div>
                 </div>
             </div>
@@ -62,9 +65,7 @@
                         </div>
                         <div class="carousel-text">
                             <h1>Best <span>Quality</span> Ingredients</h1>
-                            <p>
-                                Lorem ipsum dolor sit amet elit. Phasellus ut mollis mauris. Vivamus egestas eleifend dui ac consequat at lectus in malesuada
-                            </p>
+                           
                           
                         </div>
                     </div>
@@ -73,10 +74,8 @@
                             <img src="{% static 'img/carousel-2.jpg'%}" alt="Image">
                         </div>
                         <div class="carousel-text">
-                            <h1>World’s <span>Best</span> Chef</h1>
-                            <p>
-                                Morbi sagittis turpis id suscipit feugiat. Suspendisse eu augue urna. Morbi sagittis, orci sodales varius fermentum, tortor
-                            </p>
+                            <h1><span>Best</span> Chef</h1>
+                           
                           
                         </div>
                     </div>
@@ -86,9 +85,7 @@
                         </div>
                         <div class="carousel-text">
                             <h1>Fastest Order <span>Delivery</span></h1>
-                            <p>
-                                Sed ultrices, est eget feugiat accumsan, dui nibh egestas tortor, ut rhoncus nibh ligula euismod quam. Proin pellentesque odio
-                            </p>
+                            
                             
                         </div>
                     </div>
