@@ -169,3 +169,7 @@ def process_image(request):
         return HttpResponse('IMG SAVED')
     else:
         return HttpResponse('wrong user name or password or account does not exist!!')
+
+def menushowstudent(request):
+    menu_items = MenuItem.objects.all()
+    return render(request, 'menu_student.html', {'menu_items': menu_items})

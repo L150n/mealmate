@@ -1,6 +1,7 @@
 
 from django.shortcuts import render,redirect
 from accounts.models import *
+from django.http import JsonResponse
 
 def indexstaff(request):
     return render(request,'index_staff.html')
@@ -17,9 +18,23 @@ def addmenu(request):
         MenuItem.objects.create(item_name=item_name, description=item_description, quantity=item_quantity, price=item_price, images=item_image)
         menu_items = MenuItem.objects.all()
         return render(request, 'menu_staff.html', {'menu_items': menu_items})
-        
-    
+         
     else:
         menu_items = MenuItem.objects.all()
         return render(request, 'menu_staff.html', {'menu_items': menu_items})
-        
+def edit_menu(request,menuid):
+    item = MenuItem.objects.get(menuid=menuid)
+    if request.method == 'POST':
+        item.item_name = request.POST.get('item_name')
+        item.description = request.POST.get('description')
+        item.quantity = request.POST.get('quantity')
+        item.price = request.POST.get('price')
+        if 'menu_image' in request.FILES:
+            item.images = request.FILES['menu_image']
+        item.save()
+        menu_items = MenuItem.objects.all()
+        return render(request, 'menu_staff.html', {'menu_items': menu_items})
+    return render(request, 'menu_staff.html')
+
+
+

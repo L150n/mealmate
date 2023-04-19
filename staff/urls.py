@@ -12,6 +12,8 @@ urlpatterns = [
     path('indexstaff/', views.indexstaff, name='indexstaff'),
     path('menushow/', views.menushow, name='menushow'),
     path('addmenu/', views.addmenu, name='addmenu'),
+    path('edit_menu/<int:menuid>/', views.edit_menu, name='edit_menu'),
+    
 
 ]
 

@@ -82,9 +82,10 @@ body {
                         <a href="{% url 'accounts:index'  %}" class="nav-item nav-link active">Home</a>
                         <a href="{% url 'accounts:profile' }" class="nav-item nav-link">Profile</a>
                         <a href="#" class="nav-item nav-link">E-Wallet</a>
-                        <a href="#" class="nav-item nav-link">Order</a>
+                        <a href="{% url 'accounts:menushowstudent' %}" class="nav-item nav-link">Order</a>
                         <a href="#" class="nav-item nav-link">Transaction History</a>
                         <a href="#" class="nav-item nav-link">Feedback</a>
+                       
                         <a href="{% url 'accounts:login' %}">
                         <button type="button" class="btn btn-outline-dark">
                             <i class="fa fa-user mr-1" aria-hidden="true"></i> Logout
