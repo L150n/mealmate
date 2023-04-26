@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect
 from django.urls import reverse
 from .models import *
+from django.contrib import messages
 from io import BytesIO
 from PIL import Image
 import numpy as np
@@ -24,6 +25,9 @@ def profile(request):
 def login_view(request):
     return render(request,'login.html')
 
+def ewallet(request):
+    
+    return render(request, 'ewallet.html')
 
 def update_profile(request):
     user_id = request.session.get('studentid')
@@ -45,6 +49,8 @@ def update_profile(request):
         student.address = request.POST.get('address')
         student.save()
         context = {'student': student} 
+        messages.success(
+                    request, f'Profile updated')
         return render(request,'profile.html',context)
     
     return render(request, 'profile.html')
@@ -61,13 +67,14 @@ def loginuser(request):
             user_email = user_details.email
             request.session['studentid'] = user_id
             request.session['email'] = user_email
+            # messages.success(request, 'Login successful!')
             return render(request, 'index.html', {'studentid': user_id})
         elif useremail == 'staff@gmail.com' and password == 'staff':
             request.session['email'] = useremail
             return render(request, 'index_staff.html')
         else:
-            return HttpResponse('wrong user name or password or account does not exist!!')
-    return render(request, 'login.html')
+            return HttpResponse("<script>alert('Invalid Email or Password');window.location='/login_view';</script>")
+
 
    
 def index(request):
@@ -87,24 +94,26 @@ def reg(request):
 
         # Perform basic form validation
         if not studentid or not first_name or not email or not password or not confirm_password:
-            return render(request, 'login.html', {'error': 'All fields are required'})
+            return HttpResponse("<script>alert('All fields are Required');window.location='/login_view';</script>")
 
         if password != confirm_password:
-            return render(request, 'login.html', {'error': 'Passwords do not match'})
+            return HttpResponse("<script>alert('Password don't match');window.location='/login_view';</script>")
 
         # Check if student with the same ID or email already exists
         if Student.objects.filter(studentid=studentid).exists():
-            return render(request, 'login.html', {'error': 'A student with the same ID already exists'})
+            return HttpResponse("<script>alert('A student with the same ID already exists');window.location='/login_view';</script>")
 
         if Student.objects.filter(email=email).exists():
-            return render(request, 'login.html', {'error': 'A student with the same email already exists'})
+            return HttpResponse("<script>alert('A student with the same email already exists');window.location='/login_view';</script>")
+            
 
         # Create a new student object and save it to the database
         student = Student(studentid=studentid, first_name=first_name, email=email, password=password)
         student.save()
 
         # Redirect to a success page or login page
-        return render(request, 'login.html')
+        return HttpResponse("<script>alert('Signup Completed');window.location='/login_view';</script>")
+
 
     else:
         return render(request, 'login.html')
@@ -126,9 +135,13 @@ def update_pass(request):
                     return render(request,'profile.html',context)
                 else:
                     messages.error(request, 'New password and confirm password did not match!')
+                    context = {'student': student} 
+                    return render(request,'profile.html',context)
             else:
                 messages.error(request, 'Old password is incorrect!')
-        return render(request, 'update_pass.html')
+                context = {'student': student} 
+                return render(request,'profile.html',context)
+        
     else:
         return redirect('login')
 
@@ -166,7 +179,10 @@ def process_image(request):
         student_image = StudentImage(studentid=student, image=img_bytes.getvalue())
         student_image.save()
 
-        return HttpResponse('IMG SAVED')
+        messages.success(
+                    request, f'Image Saved Successfully')
+        context = {'student': student} 
+        return render(request,'profile.html',context)
     else:
         return HttpResponse('wrong user name or password or account does not exist!!')
 

@@ -1,6 +1,7 @@
 
 from django.shortcuts import render,redirect
 from accounts.models import *
+from django.contrib import messages
 from django.http import JsonResponse
 
 def indexstaff(request):
@@ -17,6 +18,8 @@ def addmenu(request):
         item_image = request.FILES.get('item-image')
         MenuItem.objects.create(item_name=item_name, description=item_description, quantity=item_quantity, price=item_price, images=item_image)
         menu_items = MenuItem.objects.all()
+        messages.success(
+                    request, f'Menu item Added.')
         return render(request, 'menu_staff.html', {'menu_items': menu_items})
          
     else:
@@ -33,8 +36,16 @@ def edit_menu(request,menuid):
             item.images = request.FILES['menu_image']
         item.save()
         menu_items = MenuItem.objects.all()
+        messages.success(
+                    request, f'Menu item info edited Successfully .')
         return render(request, 'menu_staff.html', {'menu_items': menu_items})
     return render(request, 'menu_staff.html')
 
-
+def delete_menu(request,menuid):
+    item = MenuItem.objects.get(menuid=menuid)
+    item.delete()
+    menu_items = MenuItem.objects.all()
+    messages.success(
+                    request, f'Menu item Deleted .')
+    return render(request, 'menu_staff.html', {'menu_items': menu_items})
 

@@ -4,18 +4,46 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
 	<style>
+
+@keyframes scrollBg {
+  from {
+    transform: translateY(0px);
+  }
+  to {
+    transform: translateY(-330px);
+  }
+  /* add another keyframe to repeat the animation */
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.scroll-bg {
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  padding-bottom: 330px;
+  background-color: #E8BA9B;
+  background-image: url('https://andreivictor.ro/codepen/scroll-bg-animation-pinterest/bg_pasta_grid-3f880df3.jpg');
+  background-size: cover;
+  animation: scrollBg 10s linear infinite;
+}
+
+
 		*,*:before,*:after{
 	margin:0;
 	padding:0;
 	box-sizing:border-box;
 }
+
+
+
 body{
 	width:100%;
 	height:100vh;
 	display:flex;
 	justify-content:center;
 	align-items:center;
-	background:-webkit-linear-gradient(left,#DCF8EF,#FEE2F8);
 	font-family:'Nunito',sans-serif;
 }
 input,button{
@@ -313,8 +341,26 @@ opacity: 0;
 	<link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800&display=swap" rel="stylesheet">
 </head>
 <body>
+	
+<div class="scroll-bg"></div>
 	<div class="cont">
-		<form method="POST" action="{% url 'accounts:loginuser' %}">
+		<div class="messages">
+			{% if messages %}
+			  {% for msg in messages %}
+				<div class="alert alert-danger text-center" role="alert">
+				  <i class="glyphicon glyphicon-exclamation-sign"></i>{{ msg }}
+				</div>
+			  {% endfor %}
+			{% endif %}
+		  </div>
+		  
+		  <script>
+			setTimeout(function() {
+			  document.querySelector('.messages').style.display = 'none';
+			}, 5000);
+		  </script>
+		  
+		<form method="POST" action="{% url 'loginuser' %}">
 			{% csrf_token %} 
 		<div class="form sign-in">
 			<h2>Sign In</h2>
@@ -355,29 +401,31 @@ opacity: 0;
 					<span class="m-in">Sign In</span>
 				</div>
 			</div>
-			<form method="post" action="{% url 'accounts:reg' %}">
+			<form method="post" action="{% url 'reg' %}">
 				{% csrf_token %}
 			<div class="form sign-up">
 				
 				<label>
-					<span>Student ID</span>
-					<input type="number" name="studentid" id="studentid">
+					<span>Admission NO</span>
+					<input type="number" name="studentid" id="studentid" pattern="[0-9]{4}" placeholder="Please enter 4-digit Admission No." required>
+
 				</label>
+				
 				<label>
 					<span>First Name</span>
-					<input type="text" name="first_name" id="first_name">
+					<input type="text" name="first_name" id="first_name" required>
 				</label>
 				<label>
 					<span>Email</span>
-					<input type="email" name="email" id="email">
+					<input type="email" name="email" id="email" required>
 				</label>
 				<label>
 					<span>Password</span>
-					<input type="password" name="password" id="confirm_password">
+					<input type="password" name="password" id="confirm_password" required>
 				</label>
 				<label>
 					<span>Confirm Password</span>
-					<input type="password" name="confirm_password" id="confirm_password">
+					<input type="password" name="confirm_password" id="confirm_password" required>
 				</label>
 				<button type="submit" class="submit">Sign Up Now</button>
 			</div>

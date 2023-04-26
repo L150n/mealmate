@@ -28,15 +28,78 @@
 
     	<link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-	<style>
-        .price-highlight {
-  color: rgb(0, 0, 0); /* Change the text color to red */
-  font-weight: bold; /* Make the text bold */
-}
+	
+    <style>
+        
+        h1 {
+          color: #333333;
+          margin-top: 50px;
+          font-family: Arial, sans-serif;
+          text-align: center;
+        }
+        .balance-card {
+            margin-left :10%;
+            width: 80%;
+            padding: 20px;
+            background-color: #ffffff;
+            border: 2px solid #cccccc;
+            border-radius: 10px;
+            display: inline-block;
+            width: 80%;
+        }
 
-    </style>
+        .balance-label {
+          font-size: 24px;
+          font-weight: bold;
+          color: #333333;
+          text-align: center;
+        }
+        .balance-value {
+          font-size: 36px;
+          font-weight: bold;
+          color: #ff9900;
+          margin-top: 10px;
+          text-align: center;
+        }
+       .table-container {
+    margin: 50px auto;
+    width: 80%;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  th,
+  td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: left;
+  }
+  
+  th {
+    background-color: #f2f2f2;
+  }
+  
+  td.debit {
+    color: red;
+  }
+  
+  td.credit {
+    color: green;
+  }
+  
+  @media only screen and (max-width: 768px) {
+    /* On small screens, make the table scroll horizontally */
+    .table-container {
+      overflow-x: auto;
+    }
+  }
+  
+      </style>
+
     </head>
-
     <body>
         <!-- Nav Bar Start -->
         <div class="navbar navbar-expand-lg bg-light navbar-light">
@@ -68,68 +131,50 @@
             </div>
         </div>
         <!-- Nav Bar End -->
-        
-        
-        <!-- Page Header Start -->
-        <div class="page-header mb-0">
-            <div class="container">
-                <div class="row">
-                    <div class="col-12">
-                        <h2>Menu</h2>
-                    </div>
-                    <div class="col-12">
-                        <a href="">Home</a>
-                        <a href="">Menu</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Page Header End -->
-                              
-               
- 
-        <div class="container py-5">
-            <div class="row">
-            
-                
-               
-                  
-                <div class="container">
-                  <div class="row">
-                    {% for item in menu_items %}
-                      <div class="col-md-6 mb-3">
-                        <div class="card">
-                          <div class="row g-0">
-                            <div class="col-md-4">
-                              <img src="{{ item.images.url}}" class="card-img-top" alt="{{ item.item_name }}">
-                            </div>
-                            <div class="col-md-8">
-                              <div class="card-body">
-                                <h5 class="card-title">{{ item.item_name }}</h5>
-                                <p class="card-text">{{ item.description }}</p>
-                                <p class="card-text">Quantity: {{ item.quantity }}</p>
-                                <p class="card-text">Price: <span class="price-highlight">₹ {{ item.price }}</span></p>
-                                <button class="btn btn-success add-to-cart-btn" data-item-id="{{ item.id }}">Add to Cart</button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    {% endfor %}
-                  </div>
-                </div>
-                
-                  
-                     <!-- Edit Menu Pop form   -->
-                     <!-- Popup form for showing menu item details -->
+        <!-- wallet code start here -->
 
-<!-- pop end here                       -->
-                  </div>
-                  
-                  
-            </div>
+        <h1>My E-Wallet</h1>
+        <br>
+        <div class="balance-card">
+          <div class="balance-label">Current Balance</div>
+          <div class="balance-value">₹ 5000</div>
+          <button class="btn btn-primary float-right">Add Funds</button>
+
+
         </div>
-    
+        <div class="table-container">
+            <h2>Transaction History</h2>
+            <table>
+              <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Amount</th>
+              </tr>
+              <tr>
+                <td>2023-04-25 10:00:00</td>
+                <td>Withdrawal</td>
+                <td class="debit">-0.00500000 BTC</td>
+              </tr>
+              <tr>
+                <td>2023-04-23 14:30:00</td>
+                <td>Deposit</td>
+                <td class="credit">+0.01000000 BTC</td>
+              </tr>
+              <tr>
+                <td>2023-04-22 09:15:00</td>
+                <td>Withdrawal</td>
+                <td class="debit">-0.00200000 BTC</td>
+              </tr>
+              <tr>
+                <td>2023-04-20 16:45:00</td>
+                <td>Deposit</td>
+                <td class="credit">+0.00500000 BTC</td>
+              </tr>
+            </table>
+          </div>
+          
+
+       <!-- wallet code end here -->
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>

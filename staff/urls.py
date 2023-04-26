@@ -5,13 +5,14 @@ from django.conf.urls.static import static
 
 
 
-app_name="staff"
+
 
 urlpatterns = [
     
     path('indexstaff/', views.indexstaff, name='indexstaff'),
     path('menushow/', views.menushow, name='menushow'),
     path('addmenu/', views.addmenu, name='addmenu'),
+    path('delete_menu/<int:menuid>/', views.delete_menu, name='delete_menu'),
     path('edit_menu/<int:menuid>/', views.edit_menu, name='edit_menu'),
     
 
