@@ -4,3 +4,4 @@ from .models import *
 admin.site.register(Student)
 admin.site.register(StudentImage)
 admin.site.register(MenuItem)
+admin.site.register(Transaction)

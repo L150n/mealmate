@@ -16,6 +16,7 @@ urlpatterns = [
     path('login_view/', views.login_view, name='login_view'),
     path('loginuser/', views.loginuser, name='loginuser'),
     path('menushowstudent/', views.menushowstudent, name='menushowstudent'),
+    path('add_fund/', views.add_fund, name='add_fund'),
 ]
 
 if settings.DEBUG:

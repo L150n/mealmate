@@ -1,11 +1,14 @@
 from django.shortcuts import render,redirect
 from django.urls import reverse
 from .models import *
+from decimal import Decimal
 from django.contrib import messages
 from io import BytesIO
 from PIL import Image
 import numpy as np
+from django.utils.html import format_html
 import cv2
+from django.utils import timezone
 import base64
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login
@@ -27,7 +30,32 @@ def login_view(request):
 
 def ewallet(request):
     
-    return render(request, 'ewallet.html')
+    user_id = request.session.get('studentid')
+    student = Student.objects.get(studentid=user_id)
+    context = {'student': student} 
+    return render(request,'ewallet.html',context)
+
+def add_fund(request):
+    if request.method == 'POST':
+        student_id = request.session.get('studentid')
+        amount = request.POST.get('transaction_amount')
+        transaction_type = 'credit'
+        student = Student.objects.get(studentid=student_id)
+        student.virtual_wallet_balance += Decimal(amount)
+        student.save()
+
+        transaction = Transaction(
+        student_id=student,
+        transaction_type=transaction_type,
+        transaction_amount=float(amount),
+        transaction_time=timezone.now()
+            )
+        transaction.save()
+        messages.success(request, format_html('Added <strong>₹{}</strong> to your virtual wallet balance.', amount))
+        context = {'student': student} 
+        return redirect('/ewallet/')
+
+    
 
 def update_profile(request):
     user_id = request.session.get('studentid')
@@ -48,10 +76,9 @@ def update_profile(request):
         student.gender = request.POST.get('gender')
         student.address = request.POST.get('address')
         student.save()
-        context = {'student': student} 
         messages.success(
                     request, f'Profile updated')
-        return render(request,'profile.html',context)
+        return redirect('/profile/')
     
     return render(request, 'profile.html')
 
@@ -131,16 +158,13 @@ def update_pass(request):
                     student.password = new_password
                     student.save()
                     messages.success(request, 'Password updated successfully!')
-                    context = {'student': student} 
-                    return render(request,'profile.html',context)
+                    return redirect('/profile/')
                 else:
                     messages.error(request, 'New password and confirm password did not match!')
-                    context = {'student': student} 
-                    return render(request,'profile.html',context)
+                    return redirect('/profile/')
             else:
                 messages.error(request, 'Old password is incorrect!')
-                context = {'student': student} 
-                return render(request,'profile.html',context)
+                return redirect('/profile/')
         
     else:
         return redirect('login')
@@ -182,7 +206,7 @@ def process_image(request):
         messages.success(
                     request, f'Image Saved Successfully')
         context = {'student': student} 
-        return render(request,'profile.html',context)
+        return redirect('/profile/')
     else:
         return HttpResponse('wrong user name or password or account does not exist!!')
 

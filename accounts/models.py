@@ -1,6 +1,8 @@
 from django.db import models
 from django.core.files.images import ImageFile
 from io import BytesIO
+import uuid
+from django.utils import timezone
 from PIL import Image
 from django.core.files.base import ContentFile
 # Create your models here.
@@ -51,3 +53,26 @@ class MenuItem(models.Model):
     quantity = models.IntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     images = models.ImageField(upload_to='images',  default='') 
+
+class Transaction(models.Model):
+    TRANSACTION_TYPES = (
+        ('credit', 'Credit'),
+        ('debit', 'Debit')
+    )
+
+    transaction_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
+    transaction_time = models.DateTimeField(default=timezone.now)
+    transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPES)
+    transaction_amount = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def save(self, *args, **kwargs):
+        if not self.transaction_id:
+            self.transaction_id = self.generate_transaction_id()
+        super().save(*args, **kwargs)
+
+    def generate_transaction_id(self):
+        transaction_id = str(uuid.uuid4().hex[:6]).upper()
+        while Transaction.objects.filter(transaction_id=transaction_id).exists():
+            transaction_id = str(uuid.uuid4().hex[:6]).upper()
+        return transaction_id

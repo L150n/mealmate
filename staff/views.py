@@ -20,11 +20,11 @@ def addmenu(request):
         menu_items = MenuItem.objects.all()
         messages.success(
                     request, f'Menu item Added.')
-        return render(request, 'menu_staff.html', {'menu_items': menu_items})
+        return redirect('/menushow/')
          
     else:
         menu_items = MenuItem.objects.all()
-        return render(request, 'menu_staff.html', {'menu_items': menu_items})
+        return redirect('/menushow/')
 def edit_menu(request,menuid):
     item = MenuItem.objects.get(menuid=menuid)
     if request.method == 'POST':
@@ -38,8 +38,8 @@ def edit_menu(request,menuid):
         menu_items = MenuItem.objects.all()
         messages.success(
                     request, f'Menu item info edited Successfully .')
-        return render(request, 'menu_staff.html', {'menu_items': menu_items})
-    return render(request, 'menu_staff.html')
+        return redirect('/menushow/')
+    return redirect('/menushow/')
 
 def delete_menu(request,menuid):
     item = MenuItem.objects.get(menuid=menuid)
@@ -47,5 +47,5 @@ def delete_menu(request,menuid):
     menu_items = MenuItem.objects.all()
     messages.success(
                     request, f'Menu item Deleted .')
-    return render(request, 'menu_staff.html', {'menu_items': menu_items})
+    return redirect('/menushow/')
 

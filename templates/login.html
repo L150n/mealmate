@@ -407,8 +407,7 @@ opacity: 0;
 				
 				<label>
 					<span>Admission NO</span>
-					<input type="number" name="studentid" id="studentid" pattern="[0-9]{4}" placeholder="Please enter 4-digit Admission No." required>
-
+					<input type="text" name="studentid" id="studentid" class="input" placeholder="Admission Number" required minlength="4" maxlength="4">
 				</label>
 				
 				<label>
@@ -436,6 +435,13 @@ opacity: 0;
 	{
 	  document.querySelector('.cont').classList.toggle('s-signup')
 	}
-  );</script>		
+  );
+  const admissionNumberInput = document.querySelector('.input[placeholder="Admission Number"]');
+
+admissionNumberInput.addEventListener('input', (event) => {
+  event.target.value = event.target.value.replace(/\D/g, '');
+});
+
+  </script>		
 </body>
 </html>
