@@ -76,3 +76,13 @@ class Transaction(models.Model):
         while Transaction.objects.filter(transaction_id=transaction_id).exists():
             transaction_id = str(uuid.uuid4().hex[:6]).upper()
         return transaction_id
+
+class Cart(models.Model):
+    cartid = models.AutoField(primary_key=True)
+    studentid = models.ForeignKey(Student, on_delete=models.CASCADE)
+    item1 = models.ForeignKey(MenuItem, related_name='item1', on_delete=models.CASCADE, null=True, blank=True)
+    item2 = models.ForeignKey(MenuItem, related_name='item2', on_delete=models.CASCADE, null=True, blank=True)
+    item3 = models.ForeignKey(MenuItem, related_name='item3', on_delete=models.CASCADE, null=True, blank=True)
+    item4 = models.ForeignKey(MenuItem, related_name='item4', on_delete=models.CASCADE, null=True, blank=True)
+    item5 = models.ForeignKey(MenuItem, related_name='item5', on_delete=models.CASCADE, null=True, blank=True)
+

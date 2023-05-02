@@ -15,6 +15,7 @@ urlpatterns = [
     path('delete_menu/<int:menuid>/', views.delete_menu, name='delete_menu'),
     path('edit_menu/<int:menuid>/', views.edit_menu, name='edit_menu'),
     
+    
 
 ]
 

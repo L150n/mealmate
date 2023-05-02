@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from django.urls import reverse
 from .models import *
 from decimal import Decimal
@@ -14,7 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 import face_recognition
-from django.http import JsonResponse
+from django.http import JsonResponse,Http404
 from django.core.files.base import ContentFile
 
 from django.http import HttpResponse,HttpResponseRedirect
@@ -205,7 +205,6 @@ def process_image(request):
 
         messages.success(
                     request, f'Image Saved Successfully')
-        context = {'student': student} 
         return redirect('/profile/')
     else:
         return HttpResponse('wrong user name or password or account does not exist!!')
@@ -213,3 +212,103 @@ def process_image(request):
 def menushowstudent(request):
     menu_items = MenuItem.objects.all()
     return render(request, 'menu_student.html', {'menu_items': menu_items})
+
+def add_to_cart(request, item_id):
+    try:
+        menu_item = MenuItem.objects.get(menuid=item_id)
+    except MenuItem.DoesNotExist:
+        raise Http404('Menu item not found')
+
+    # Check if the student is logged in
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    # Get the student object
+    student_id = request.session.get('studentid')
+    student = Student.objects.get(pk=student_id)
+
+    # Check if the student already has a cart
+    cart, created = Cart.objects.get_or_create(studentid=student)
+
+    # Check if the cart already contains the maximum number of items
+    if cart.item1 and cart.item2 and cart.item3 and cart.item4 and cart.item5:
+        return redirect('/menushowstudent/')
+
+    # Add the selected item to the cart
+    if not cart.item1:
+        cart.item1 = menu_item
+    elif not cart.item2:
+        cart.item2 = menu_item
+    elif not cart.item3:
+        cart.item3 = menu_item
+    elif not cart.item4:
+        cart.item4 = menu_item
+    elif not cart.item5:
+        cart.item5 = menu_item
+    messages.success(request, f'Item added to cart')
+    cart.save()
+
+    return redirect('/menushowstudent/')
+
+
+def viewcart(request):
+    # Get the student object
+    student_id = request.session.get('studentid')
+    student = Student.objects.get(pk=student_id)
+
+    # Get the cart items for the student
+    cart_items = Cart.objects.filter(studentid=student)
+
+    # Create a list to store the menu item details for each cart item
+    cart_item_details = []
+
+    # Loop through the cart items and fetch the related menu item details
+    for item in cart_items:
+        item_details = {
+            'cartid': item.cartid,
+            'item1': None,
+            'item2': None,
+            'item3': None,
+            'item4': None,
+            'item5': None,
+        }
+
+        if item.item1:
+            item_details['item1'] = MenuItem.objects.get(menuid=item.item1.menuid)
+
+        if item.item2:
+            item_details['item2'] = MenuItem.objects.get(menuid=item.item2.menuid)
+
+        if item.item3:
+            item_details['item3'] = MenuItem.objects.get(menuid=item.item3.menuid)
+
+        if item.item4:
+            item_details['item4'] = MenuItem.objects.get(menuid=item.item4.menuid)
+
+        if item.item5:
+            item_details['item5'] = MenuItem.objects.get(menuid=item.item5.menuid)
+
+        cart_item_details.append(item_details)
+
+    context = {
+        'cart_item_details': cart_item_details,
+    }
+
+    return render(request, 'cart.html', context)
+
+
+def remove_item_from_cart(request, cart_id, item_number):
+    cart = Cart.objects.get(cartid=cart_id)
+    # Remove the item from the cart based on the item number
+    if item_number == 'item1':
+        cart.item1 = None
+    elif item_number == 'item2':
+        cart.item2 = None
+    elif item_number == 'item3':
+        cart.item3 = None
+    elif item_number == 'item4':
+        cart.item4 = None
+    elif item_number == 'item5':
+        cart.item5 = None
+    cart.save()
+    return redirect('/viewcart/')

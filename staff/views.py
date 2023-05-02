@@ -1,5 +1,5 @@
 
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect 
 from accounts.models import *
 from django.contrib import messages
 from django.http import JsonResponse
@@ -48,4 +48,6 @@ def delete_menu(request,menuid):
     messages.success(
                     request, f'Menu item Deleted .')
     return redirect('/menushow/')
+
+
 

@@ -45,6 +45,19 @@
   height: 200px;
   align-self: center;
 }
+.add-to-cart-link {
+  text-decoration: none; /* Remove underline */
+  color: rgb(255, 255, 255); 
+}
+.add-to-cart-link:hover {
+  text-decoration: none; /* Remove underline */
+  color: rgb(255, 255, 255); 
+}
+
+.cart-btn {
+  float: right;
+}
+
   </style>
 </head>
 
@@ -65,9 +78,6 @@
           <a href="{% url 'menushowstudent' %}" class="nav-item nav-link">Order</a>
           <a href="#" class="nav-item nav-link">Transaction History</a>
           <a href="#" class="nav-item nav-link">Feedback</a>
-          <button type="button" class="btn">
-            <i class="bi bi-cart-plus mr-1" aria-hidden="true"></i>
-          </button>
 
           <a href="{% url 'login' %}">
             <button type="button" class="btn btn-outline-dark">
@@ -80,9 +90,34 @@
   </div>
   <!-- Nav Bar End -->
 
+  {% if messages %}
+  <div class="alert alert-success alert-dismissible fade show text-center text-center" role="alert">
+    {% for message in messages %}
+      <span {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</span><br>
+    {% endfor %}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <script>
+    setTimeout(function() {
+      $('.alert').alert('close');
+    }, 5000);
+  </script>
+{% endif %}
+
 
   <div class="container py-5">
     <div class="row">
+      <div class="col-lg-10 mx-auto col-12 text-center mb-3">
+        <h1 class="mt-0 text-black">Menu</h1>
+        <a href="{% url 'viewcart' %}">
+        <button type="button" class="btn btn-primary cart-btn">
+          <i class="bi bi-cart-plus mr-1" aria-hidden="true"></i> View Cart
+        </button></a>
+        <hr class="accent my-5" style="border-width: 2px; border-style: solid; width: 100%;">
+        
+      </div>
       <div class="container">
         <div class="row">
           {% for item in menu_items %}
@@ -100,7 +135,9 @@
                     <h5 class="card-title">{{ item.item_name }}</h5>
                     <p class="card-text">{{ item.description }}</p>
                     <p class="card-text">Price: <span class="price-highlight">₹ {{ item.price }}</span></p>
-                    <button class="btn btn-success add-to-cart-btn" data-item-id="{{ item.id }}">Add to Cart</button>
+                    <button class="btn btn-success add-to-cart-btn" data-item-id="{{ item.id }}">
+                      <a href="{% url 'add_to_cart' item.menuid %}" class="add-to-cart-link">Add to Cart</a>
+                  </button>
                   </div>
                 </div>
               </div>
@@ -113,6 +150,8 @@
     </div>
   </div>
   </div>
+
+
 
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>

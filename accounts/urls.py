@@ -15,8 +15,11 @@ urlpatterns = [
     path('reg/', views.reg, name='reg'),
     path('login_view/', views.login_view, name='login_view'),
     path('loginuser/', views.loginuser, name='loginuser'),
+    path('add_to_cart/<int:item_id>/', views.add_to_cart, name='add_to_cart'),
     path('menushowstudent/', views.menushowstudent, name='menushowstudent'),
     path('add_fund/', views.add_fund, name='add_fund'),
+    path('viewcart/', views.viewcart, name='viewcart'),
+    path('remove_item/<int:cart_id>/<str:item_number>/', views.remove_item_from_cart, name='remove_item_from_cart'),
 ]
 
 if settings.DEBUG:
