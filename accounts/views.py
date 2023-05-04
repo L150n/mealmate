@@ -221,7 +221,7 @@ def add_to_cart(request, item_id):
 
     # Check if the student is logged in
     if not request.user.is_authenticated:
-        return redirect('login')
+        return redirect('/login/')
 
     # Get the student object
     student_id = request.session.get('studentid')
@@ -237,16 +237,23 @@ def add_to_cart(request, item_id):
     # Add the selected item to the cart
     if not cart.item1:
         cart.item1 = menu_item
+        menu_item.quantity -= 1
     elif not cart.item2:
         cart.item2 = menu_item
+        menu_item.quantity -= 1
     elif not cart.item3:
         cart.item3 = menu_item
+        menu_item.quantity -= 1
     elif not cart.item4:
         cart.item4 = menu_item
+        menu_item.quantity -= 1
     elif not cart.item5:
         cart.item5 = menu_item
+        menu_item.quantity -= 1
+
     messages.success(request, f'Item added to cart')
     cart.save()
+    menu_item.save()
 
     return redirect('/menushowstudent/')
 
@@ -299,16 +306,114 @@ def viewcart(request):
 
 def remove_item_from_cart(request, cart_id, item_number):
     cart = Cart.objects.get(cartid=cart_id)
-    # Remove the item from the cart based on the item number
+
+    # Get the menu item from the cart based on the item number
     if item_number == 'item1':
+        menu_item = cart.item1
         cart.item1 = None
     elif item_number == 'item2':
+        menu_item = cart.item2
         cart.item2 = None
     elif item_number == 'item3':
+        menu_item = cart.item3
         cart.item3 = None
     elif item_number == 'item4':
+        menu_item = cart.item4
         cart.item4 = None
     elif item_number == 'item5':
+        menu_item = cart.item5
         cart.item5 = None
+
+    # If the menu item exists, increase its quantity by 1
+    if menu_item:
+        menu_item.quantity += 1
+        menu_item.save()
+
     cart.save()
-    return redirect('/viewcart/')
+    return HttpResponse("<script>alert('Item Removed');window.location='/viewcart';</script>")
+
+
+def checkout(request):
+    if request.method == 'POST':
+        # Get student information
+        student_id = request.session.get('studentid')
+        student = Student.objects.get(pk=student_id)
+        password = request.POST.get('password')
+
+        # Check student password
+        if password != student.password:
+            return HttpResponse("<script>alert('Incorrect Password');window.location='/viewcart';</script>")
+            
+
+        # Get cart information
+        cart_items = Cart.objects.filter(studentid=student_id)
+        total_amount = Decimal(request.POST.get('total_amount'))
+
+        # Check if student has enough balance
+        if student.virtual_wallet_balance < total_amount:
+            return HttpResponse("<script>alert('Insufficient balance');window.location='/viewcart';</script>")
+
+        # Store order information
+        order_items = []
+        for item in cart_items:
+            for i in range(1, 6):
+                menu_item = getattr(item, 'item{}'.format(i))
+                if menu_item:
+                    order_items.append(menu_item)
+
+        order_time = timezone.now()
+        order_mode = 'online'
+
+        # Create order object
+        order = Order.objects.create(
+            studentid=student,
+            item1=order_items[0] if len(order_items) > 0 else None,
+            item2=order_items[1] if len(order_items) > 1 else None,
+            item3=order_items[2] if len(order_items) > 2 else None,
+            item4=order_items[3] if len(order_items) > 3 else None,
+            item5=order_items[4] if len(order_items) > 4 else None,
+            total_amount=total_amount,
+            order_time=order_time,
+            order_mode=order_mode
+        )
+        
+
+         # Create transaction
+        transaction_type = 'debit'
+        transaction_amount = total_amount
+        transaction = Transaction.objects.create(
+            student_id=student,
+            transaction_type=transaction_type,
+            transaction_amount=transaction_amount
+        )
+
+        # Update student wallet balance
+        student.virtual_wallet_balance -= total_amount
+        student.save()
+
+        # Empty cart
+        cart_items.delete()
+        return receipt(request, order.orderid)
+
+    return render(request, 'checkout.html')
+
+
+def receipt(request, order_id):
+    order = Order.objects.get(pk=order_id)
+    
+    items = []
+    for i in range(1, 6):
+        item_field = f"item{i}"
+        if getattr(order, item_field):
+            menu_item = MenuItem.objects.get(pk=getattr(order, item_field).menuid)
+            item = {
+                'name': menu_item.item_name,
+                'price': menu_item.price,
+            }
+            items.append(item)
+
+    context = {
+        'order': order,
+        'items': items,
+    }
+    return render(request, 'receipt.html', context)

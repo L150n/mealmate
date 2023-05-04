@@ -86,3 +86,25 @@ class Cart(models.Model):
     item4 = models.ForeignKey(MenuItem, related_name='item4', on_delete=models.CASCADE, null=True, blank=True)
     item5 = models.ForeignKey(MenuItem, related_name='item5', on_delete=models.CASCADE, null=True, blank=True)
 
+
+class Order(models.Model):
+    orderid = models.AutoField(primary_key=True)
+    studentid = models.ForeignKey(Student, on_delete=models.CASCADE)
+    order_time = models.DateTimeField()
+    ORDER_MODE_CHOICES = [('online', 'Online'), ('offline', 'Offline')]
+    order_mode = models.CharField(max_length=7, choices=ORDER_MODE_CHOICES)
+    item1 = models.ForeignKey(MenuItem, on_delete=models.CASCADE, related_name='orders_item1', null=True, blank=True)
+    item2 = models.ForeignKey(MenuItem, on_delete=models.CASCADE, related_name='orders_item2', null=True, blank=True)
+    item3 = models.ForeignKey(MenuItem, on_delete=models.CASCADE, related_name='orders_item3', null=True, blank=True)
+    item4 = models.ForeignKey(MenuItem, on_delete=models.CASCADE, related_name='orders_item4', null=True, blank=True)
+    item5 = models.ForeignKey(MenuItem, on_delete=models.CASCADE, related_name='orders_item5', null=True, blank=True)
+    total_amount = models.DecimalField(max_digits=6, decimal_places=2)
+
+    def save(self, *args, **kwargs):
+        if not self.orderid:
+            latest_order = Order.objects.order_by('-orderid').first()
+            self.orderid = (latest_order.orderid + 1) if latest_order else 10000
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.orderid:05d}"
