@@ -8,6 +8,7 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('ewallet/', views.ewallet, name='ewallet'),
     path('profile/', views.profile, name='profile'),
+    path('order_history_student/', views.order_history_student, name='order_history_student'),
     path('update_profile/', views.update_profile, name='update_profile'),
     path('update_pass/', views.update_pass, name='update_pass'),
     path('process_image/', views.process_image, name='process_image'),
@@ -19,6 +20,7 @@ urlpatterns = [
     path('menushowstudent/', views.menushowstudent, name='menushowstudent'),
     path('add_fund/', views.add_fund, name='add_fund'),
     path('checkout/', views.checkout, name='checkout'),
+    path('receipt/<int:order_id>/', views.receipt, name='receipt'),
     path('viewcart/', views.viewcart, name='viewcart'),
     path('remove_item/<int:cart_id>/<str:item_number>/', views.remove_item_from_cart, name='remove_item_from_cart'),
 ]

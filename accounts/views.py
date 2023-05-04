@@ -417,3 +417,17 @@ def receipt(request, order_id):
         'items': items,
     }
     return render(request, 'receipt.html', context)
+
+
+def order_history_student(request):
+    user_id = request.session.get('studentid')
+    student = Student.objects.get(studentid=user_id)
+    orders = Order.objects.filter(studentid=student).order_by('-order_time')
+    
+    # Calculate number of items for each order
+    for order in orders:
+        items = [order.item1, order.item2, order.item3, order.item4, order.item5]
+        order.num_items = sum(1 for item in items if item is not None)
+
+    context = {'orders': orders}
+    return render(request, 'order_history_student.html', context)
