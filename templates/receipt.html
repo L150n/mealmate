@@ -395,7 +395,7 @@ THANK YOU FOR YOUR TRUST</p>
       <div class="produits">
 		{% for item in items %}
 		<div class="col2">
-		  <p id="item">{{ item.name }} </p>
+		  <p id="item">{{ item.name }} *{{ item.quantity }} </p>
 		  <p class="prix" id="itemprice">₹ {{ item.price }}</p>
 		</div>
 		{% endfor %}

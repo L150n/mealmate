@@ -16,7 +16,6 @@ from django.contrib import messages
 import face_recognition
 from django.http import JsonResponse,Http404
 from django.core.files.base import ContentFile
-
 from django.http import HttpResponse,HttpResponseRedirect
 
 # Create your views here.
@@ -172,11 +171,9 @@ def update_pass(request):
 @csrf_exempt
 def process_image(request):
     if request.method == 'POST':
-        data = request.POST['imagedata']
-        format, imgstr = data.split(';base64,') 
-        ext = format.split('/')[-1] 
-        image_data = imgstr.encode('utf-8')
-        image_data = base64.b64decode(image_data)
+        image_data = request.POST['imagedata']
+        # Decode the base64-encoded image data
+        image_data = base64.b64decode(image_data.split(',')[1])
 
         # create an in-memory binary stream from the decoded image data
         stream = BytesIO(image_data)
@@ -184,9 +181,6 @@ def process_image(request):
         # create a PIL Image object from the binary stream
         img = Image.open(stream)
 
-        # save the PIL Image object to a bytes object
-        img_bytes = BytesIO()
-        img.save(img_bytes, format=ext)
 
         # get the student object from the session
         student_id = request.session.get('studentid')
@@ -200,7 +194,7 @@ def process_image(request):
             pass
 
         # create a new StudentImage object and save it to the database
-        student_image = StudentImage(studentid=student, image=img_bytes.getvalue())
+        student_image = StudentImage(studentid=student, image=image_data)
         student_image.save()
 
         messages.success(
@@ -232,6 +226,7 @@ def add_to_cart(request, item_id):
 
     # Check if the cart already contains the maximum number of items
     if cart.item1 and cart.item2 and cart.item3 and cart.item4 and cart.item5:
+        messages.error(request, 'The cart already contains the maximum number of items')
         return redirect('/menushowstudent/')
 
     # Add the selected item to the cart
@@ -251,7 +246,7 @@ def add_to_cart(request, item_id):
         cart.item5 = menu_item
         menu_item.quantity -= 1
 
-    messages.success(request, f'Item added to cart')
+    messages.success(request, f'{menu_item.item_name} added to cart')
     cart.save()
     menu_item.save()
 
@@ -406,12 +401,26 @@ def receipt(request, order_id):
         item_field = f"item{i}"
         if getattr(order, item_field):
             menu_item = MenuItem.objects.get(pk=getattr(order, item_field).menuid)
-            item = {
-                'name': menu_item.item_name,
-                'price': menu_item.price,
-            }
-            items.append(item)
-
+            item_name = menu_item.item_name
+            item_price = menu_item.price
+            item_quantity = 1
+            
+            # Check if the item already exists in the list
+            for item in items:
+                if item['name'] == item_name:
+                    item['quantity'] += 1
+                    item['price'] += item_price
+                    item_quantity = item['quantity']
+                    break
+            
+            # If the item doesn't exist, add it to the list
+            else:
+                item = {
+                    'name': item_name,
+                    'price': item_price,
+                    'quantity': item_quantity,
+                }
+                items.append(item)
     context = {
         'order': order,
         'items': items,
@@ -431,3 +440,37 @@ def order_history_student(request):
 
     context = {'orders': orders}
     return render(request, 'order_history_student.html', context)
+
+def feedbackmenu(request):
+    student_id = request.session.get('studentid')
+    orders = Order.objects.filter(studentid=student_id)
+    items = []
+    for order in orders:
+        items += [order.item1, order.item2, order.item3, order.item4, order.item5]
+    # remove duplicates
+    items = list(set(filter(None, items)))
+    return render(request, 'feedback.html', {'items': items})
+
+def add_feedback(request, item_id):
+    if request.method == 'POST':
+        comment = request.POST.get('comment')
+        rating = request.POST.get('rating')
+        student_id = request.session.get('studentid')
+        item = MenuItem.objects.get(pk=item_id)
+        
+        # create a new Feedback object and save it
+        feedback = Feedback.objects.create(
+            studentid=Student.objects.get(pk=student_id),
+            itemid=item,
+            comment=comment,
+            rating=rating,
+            submission_time=timezone.now()
+        )
+        feedback.save()
+
+        return redirect('/feedbackmenu/')
+    else:
+        # if request is not a POST request, render the feedback form
+        item = MenuItem.objects.get(pk=item_id)
+        context = {'item': item}
+        return render(request, 'feedback.html', context)

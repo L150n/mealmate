@@ -11,6 +11,15 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+        <!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous">
+
+<!-- Font Awesome 5 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+integrity="sha512-B9zf+gL/w/4Q/UDhqVfOfT/OM06T/GNpO9dNllkTWikax4O4N0gPJwOB1ZXlNWJFWHq3CncmPmao9XduYb1RQ=="
+crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 
 </head>
 <style>
@@ -362,9 +371,9 @@ label {
 
     <br>
     {% if messages %}
-    <div class="alert alert-success alert-dismissible fade show text-center text-center" role="alert">
+    <div class="alert alert-dismissible fade show text-center{% if messages.tags %} {{ messages.tags }}{% endif %}" role="alert">
       {% for message in messages %}
-        <span {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</span><br>
+        <span {% if message.tags %} class="{% if message.tags == 'success' %}text-success{% elif message.tags == 'error' %}text-danger{% endif %}"{% endif %}>{{ message }}</span><br>
       {% endfor %}
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>

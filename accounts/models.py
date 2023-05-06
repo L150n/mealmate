@@ -108,3 +108,12 @@ class Order(models.Model):
 
     def __str__(self):
         return f"{self.orderid:05d}"
+    
+
+class Feedback(models.Model):
+    feedback_id = models.AutoField(primary_key=True)
+    studentid = models.ForeignKey(Student, on_delete=models.CASCADE)
+    itemid = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
+    comment = models.CharField(max_length=255)
+    rating = models.IntegerField()
+    submission_time = models.DateTimeField()

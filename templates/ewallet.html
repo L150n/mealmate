@@ -201,7 +201,7 @@
                         <a href="{% url 'ewallet'%}" class="nav-item nav-link">E-Wallet</a>
                         <a href="{% url 'menushowstudent' %}" class="nav-item nav-link">Order</a>
                       <a href="{% url 'order_history_student' %}" class="nav-item nav-link">Order History</a>
-                      <a href="#" class="nav-item nav-link">Feedback</a>
+                      <a href="{% url 'feedbackmenu' %}" class="nav-item nav-link">Feedback</a>
                       <a href="{% url 'login' %}">
                       <button type="button" class="btn btn-outline-dark">
                           <i class="fa fa-user mr-1" aria-hidden="true"></i> Logout
@@ -213,9 +213,9 @@
         </div>
         <!-- Nav Bar End -->
         {% if messages %}
-        <div class="alert alert-success alert-dismissible fade show text-center text-center" role="alert">
+        <div class="alert alert-dismissible fade show text-center{% if messages.tags %} {{ messages.tags }}{% endif %}" role="alert" style="font-size: 20px; padding: 20px;">
           {% for message in messages %}
-            <span {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</span><br>
+            <span {% if message.tags %} class="{% if message.tags == 'success' %}text-success{% elif message.tags == 'error' %}text-danger{% endif %}"{% endif %}>{{ message }}</span><br>
           {% endfor %}
           <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -227,6 +227,7 @@
           }, 5000);
         </script>
       {% endif %}
+      
 
         <!-- wallet code start here -->
 
@@ -375,6 +376,7 @@ amountInput.addEventListener('input', (event) => {
         <div class="table-container">
             <h2>Transaction History</h2>
             <table>
+              <hr class="accent my-6" style="border-width: 2px; border-style: ridge; width: 100%;">
               <thead>
                 <tr>
                   <th>Transaction ID</th>

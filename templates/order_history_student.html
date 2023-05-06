@@ -75,7 +75,7 @@
           <a href="{% url 'ewallet'%}" class="nav-item nav-link">E-Wallet</a>
           <a href="{% url 'menushowstudent' %}" class="nav-item nav-link">Order</a>
           <a href="{% url 'order_history_student' %}" class="nav-item nav-link">Order History</a>
-          <a href="#" class="nav-item nav-link">Feedback</a>
+          <a href="{% url 'feedbackmenu' %}" class="nav-item nav-link">Feedback</a>
 
           <a href="{% url 'login' %}">
             <button type="button" class="btn btn-outline-dark">
@@ -93,10 +93,10 @@
     <div class="row">
       <div class="col-lg-10 mx-auto col-12 text-center mb-3">
         <h1 class="mt-0 text-black">My Order History</h1>
-        <hr class="accent my-5" style="border-width: 2px; border-style: solid; width: 100%;">
       </div>
     </div>
     <table class="table">
+      <hr class="accent my-5" style="border-width: 2px; border-style: dotted; width: 100%;">
         <thead class="table-dark">
             <tr>
                 <th class="text-center">#</th>

@@ -22,6 +22,8 @@ urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),
     path('receipt/<int:order_id>/', views.receipt, name='receipt'),
     path('viewcart/', views.viewcart, name='viewcart'),
+    path('feedbackmenu/', views.feedbackmenu, name='feedbackmenu'),
+    path('add_feedback/<int:item_id>/', views.add_feedback, name='add_feedback'),
     path('remove_item/<int:cart_id>/<str:item_number>/', views.remove_item_from_cart, name='remove_item_from_cart'),
 ]
 
