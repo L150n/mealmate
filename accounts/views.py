@@ -226,27 +226,31 @@ def add_to_cart(request, item_id):
 
     # Check if the cart already contains the maximum number of items
     if cart.item1 and cart.item2 and cart.item3 and cart.item4 and cart.item5:
-        messages.error(request, 'The cart already contains the maximum number of items')
+        messages.warning(request, 'The cart already contains the maximum number of items')
         return redirect('/menushowstudent/')
 
     # Add the selected item to the cart
     if not cart.item1:
         cart.item1 = menu_item
         menu_item.quantity -= 1
+        messages.success(request, f'{menu_item.item_name} added to cart')
     elif not cart.item2:
         cart.item2 = menu_item
         menu_item.quantity -= 1
+        messages.success(request, f'{menu_item.item_name} added to cart')
     elif not cart.item3:
         cart.item3 = menu_item
         menu_item.quantity -= 1
+        messages.success(request, f'{menu_item.item_name} added to cart')
     elif not cart.item4:
         cart.item4 = menu_item
         menu_item.quantity -= 1
+        messages.success(request, f'{menu_item.item_name} added to cart')
     elif not cart.item5:
         cart.item5 = menu_item
         menu_item.quantity -= 1
+        messages.success(request, f'{menu_item.item_name} added to cart')
 
-    messages.success(request, f'{menu_item.item_name} added to cart')
     cart.save()
     menu_item.save()
 

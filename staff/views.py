@@ -6,12 +6,13 @@ from django.http import JsonResponse,Http404
 from django.utils.html import format_html
 import face_recognition
 import base64
+from decimal import Decimal
 import cv2
 from PIL import Image
 import io 
 import numpy as np
 from django.http import HttpResponse
-
+student_id = None 
 def indexstaff(request):
     return render(request,'index_staff.html')
 def menushow(request):
@@ -88,6 +89,8 @@ def check_face(request):
             if matches[0]:
                 # If a match is found, return the corresponding student ID
                 student = get_object_or_404(Student, pk=student_image.studentid_id)
+                global student_id 
+                student_id = student.studentid 
                 menu_items = MenuItem.objects.all()
                 messages.success(request,format_html('Student <strong>{} {}</strong> with Admission No : <strong>{}</strong> found successfully.'.format(student.first_name, student.last_name, student.studentid)))
                 return render(request, 'order_staff.html', {'student': student , 'menu_items': menu_items})
@@ -97,8 +100,9 @@ def check_face(request):
     return render(request, 'order_staff.html')
 
 
-def add_to_cart_staff(request, item_id, student_id):
+def add_to_cart_staff(request, item_id):
     menu_itemsall = MenuItem.objects.all()
+    cartall = Cart.objects.filter(studentid=student_id)
     try:
         menu_item = MenuItem.objects.get(menuid=item_id)
     except MenuItem.DoesNotExist:
@@ -112,26 +116,148 @@ def add_to_cart_staff(request, item_id, student_id):
 
     # Check if the cart already contains the maximum number of items
     if cart.item1 and cart.item2 and cart.item3 and cart.item4 and cart.item5:
-        messages.error(request, f"Maximum number of items already in cart for student {student.first_name}")
+        messages.warning(request, f"Maximum number of items already in cart for student {student.first_name}")
 
     # Add the selected item to the cart
     if not cart.item1:
         cart.item1 = menu_item
         menu_item.quantity -= 1
+        messages.success(request, f"{menu_item.item_name} added to cart for student {student.first_name}")
     elif not cart.item2:
         cart.item2 = menu_item
         menu_item.quantity -= 1
+        messages.success(request, f"{menu_item.item_name} added to cart for student {student.first_name}")
     elif not cart.item3:
         cart.item3 = menu_item
         menu_item.quantity -= 1
+        messages.success(request, f"{menu_item.item_name} added to cart for student {student.first_name}")
     elif not cart.item4:
         cart.item4 = menu_item
         menu_item.quantity -= 1
+        messages.success(request, f"{menu_item.item_name} added to cart for student {student.first_name}")
     elif not cart.item5:
         cart.item5 = menu_item
         menu_item.quantity -= 1
+        messages.success(request, f"{menu_item.item_name} added to cart for student {student.first_name}")
 
-    messages.success(request, f"{menu_item.item_name} added to cart for student {student.first_name}")
     cart.save()
     menu_item.save()
-    return render(request, 'order_staff.html', {'student': student , 'menu_items': menu_itemsall})
+    return render(request, 'order_staff.html', {'student': student , 'menu_items': menu_itemsall , 'carts':cartall})
+def delete_cart_item(request, cart_id, item_number):
+    menu_itemsall = MenuItem.objects.all()
+    cartall = Cart.objects.filter(studentid=student_id)
+    cart = Cart.objects.get(cartid=cart_id)
+    student = get_object_or_404(Student, pk=student_id)
+    # Get the menu item from the cart based on the item number
+    if item_number == 'item1':
+        menu_item = cart.item1
+        cart.item1 = None
+    elif item_number == 'item2':
+        menu_item = cart.item2
+        cart.item2 = None
+    elif item_number == 'item3':
+        menu_item = cart.item3
+        cart.item3 = None
+    elif item_number == 'item4':
+        menu_item = cart.item4
+        cart.item4 = None
+    elif item_number == 'item5':
+        menu_item = cart.item5
+        cart.item5 = None
+
+    # If the menu item exists, increase its quantity by 1
+    if menu_item:
+        menu_item.quantity += 1
+        menu_item.save()
+        messages.warning(request, f"{menu_item.item_name} removed from cart for student {student.first_name}")
+    messages.warning(request, f" ")
+    cart.save()
+    return render(request, 'order_staff.html', {'student': student , 'menu_items': menu_itemsall , 'carts':cartall})
+
+def checkout_staff(request):
+    if request.method == 'POST':
+        # Get student information
+        student = get_object_or_404(Student, pk=student_id)
+        cart_items = Cart.objects.filter(studentid=student_id)
+        total_amount = Decimal(request.POST.get('total_amount'))
+    
+                # Check if student has enough balance
+        if student.virtual_wallet_balance < total_amount:
+            messages.error(request, f"{student.first_name} has Insufficient balance ")
+            return redirect('/order_staff/')
+
+        # Store order information
+        order_items = []
+        for item in cart_items:
+            for i in range(1, 6):
+                menu_item = getattr(item, 'item{}'.format(i))
+                if menu_item:
+                    order_items.append(menu_item)
+
+        order_time = timezone.now()
+        order_mode = 'offline'
+
+        # Create order object
+        order = Order.objects.create(
+            studentid=student,
+            item1=order_items[0] if len(order_items) > 0 else None,
+            item2=order_items[1] if len(order_items) > 1 else None,
+            item3=order_items[2] if len(order_items) > 2 else None,
+            item4=order_items[3] if len(order_items) > 3 else None,
+            item5=order_items[4] if len(order_items) > 4 else None,
+            total_amount=total_amount,
+            order_time=order_time,
+            order_mode=order_mode
+        )
+        
+
+         # Create transaction
+        transaction_type = 'debit'
+        transaction_amount = total_amount
+        transaction = Transaction.objects.create(
+            student_id=student,
+            transaction_type=transaction_type,
+            transaction_amount=transaction_amount
+        )
+
+        # Update student wallet balance
+        student.virtual_wallet_balance -= total_amount
+        student.save()
+
+        # Empty cart
+        cart_items.delete()
+        return receipt_staff(request, order.orderid)
+    
+def receipt_staff(request, orderid):
+    order = Order.objects.get(pk=orderid)
+    
+    items = []
+    for i in range(1, 6):
+        item_field = f"item{i}"
+        if getattr(order, item_field):
+            menu_item = MenuItem.objects.get(pk=getattr(order, item_field).menuid)
+            item_name = menu_item.item_name
+            item_price = menu_item.price
+            item_quantity = 1
+            
+            # Check if the item already exists in the list
+            for item in items:
+                if item['name'] == item_name:
+                    item['quantity'] += 1
+                    item['price'] += item_price
+                    item_quantity = item['quantity']
+                    break
+            
+            # If the item doesn't exist, add it to the list
+            else:
+                item = {
+                    'name': item_name,
+                    'price': item_price,
+                    'quantity': item_quantity,
+                }
+                items.append(item)
+    context = {
+        'order': order,
+        'items': items,
+    }
+    return render(request, 'receipt_staff.html', context)

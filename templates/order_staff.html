@@ -16,8 +16,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-fbhdl1Ie3q4AH0X0mBf/X7iPaCwOGyV7H8eLhjlV7QdDtF/BElVzGHdeN6UuV6Ug5or5fLhqclS5+wFwn1G+7Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-  
+    
   <!-- CSS Libraries -->
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
@@ -99,7 +100,7 @@
   {% if messages %}
   <div class="alert alert-dismissible fade show text-center{% if messages.tags %} {{ messages.tags }}{% endif %}" role="alert" style="font-size: 20px; padding: 20px;">
     {% for message in messages %}
-    <span {% if message.tags %} class="{% if message.tags == 'success' %}text-success{% elif message.tags == 'error' %}text-danger{% elif message.tags == 'warning' %}text-dark{% endif %}"{% endif %}>{{ message }}</span><br>
+    <span {% if message.tags %} class="{% if message.tags == 'success' %}text-success{% elif message.tags == 'error' %}text-danger{% elif message.tags == 'warning' %}text-warning{% endif %}"{% endif %}>{{ message }}</span><br>
     {% if message.tags == 'success' or message.tags == 'warning' %}
       <script>
         $(document).ready(function(){
@@ -167,7 +168,7 @@
                         <p class="card-text">{{ item.description }}</p>
                         <p class="card-text">Price: <span class="price-highlight">₹ {{ item.price }}</span></p>
                         <button class="btn btn-success add-to-cart-btn" data-item-id="{{ item.id }}">
-                          <a href="{% url 'add_to_cart_staff' item.menuid student.studentid %}" class="add-to-cart-link">Add to Cart</a>
+                          <a href="{% url 'add_to_cart_staff' item.menuid %}" class="add-to-cart-link">Add to Cart</a>
                         </button>
                       </div>
                     </div>
@@ -193,33 +194,104 @@
         </div>
         <div class="modal-body">
           <table class="table">
-            <thead>
+            <thead class="table-dark">
               <tr>
-                <th>Item Name</th>
-                <th>Price</th>
-                <th>Action</th>
+                <th class="text-center">Item Name</th>
+                <th class="text-center">Price</th>
+                <th class="text-center">Action</th>
               </tr>
             </thead>
             <tbody>
-              {% for item in cart %}
-              <tr>
-                <td>{{ item.item1.item_name }}</td>
-                <td>${{ item.price }}</td>
-                <td>
-                  <form method="POST" action="">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                  </form>
-                </td>
+                {% if carts%}
+                {% for cart in carts %}
+                {% if cart.item1 %}
+                <tr>
+                  <td class="text-center">{{ cart.item1.item_name }}</td>
+                  <td class="text-center" id="item-price">₹ {{ cart.item1.price }}</td>
+                  <td class="text-center">
+                    <form method="POST" action="{% url 'delete_cart_item' cart_id=cart.cartid item_number='item1'  %}">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-danger btn-sm">  <i class="fa fa-trash" aria-hidden="true"></i>  Delete</button>
+                    </form>
+                  </td>
+                </tr>
+                {% endif %}
+                {% if cart.item2 %}
+                <tr>
+                  <td class="text-center">{{ cart.item2.item_name }}</td>
+                  <td class="text-center" id="item-price">₹ {{ cart.item2.price }}</td>
+                  <td class="text-center">
+                    <form method="POST" action="{% url 'delete_cart_item' cart_id=cart.cartid item_number='item2'  %}">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-danger btn-sm">  <i class="fa fa-trash" aria-hidden="true"></i>  Delete</button>
+                    </form>
+                  </td>
+                </tr>
+                {% endif %}
+                {% if cart.item3 %}
+                <tr>
+                  <td class="text-center">{{ cart.item3.item_name }}</td>
+                  <td class="text-center" id="item-price">₹ {{ cart.item3.price }}</td>
+                  <td class="text-center">
+                    <form method="POST" action="{% url 'delete_cart_item' cart_id=cart.cartid item_number='item3'  %}">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-danger btn-sm">  <i class="fa fa-trash" aria-hidden="true"></i>  Delete</button>
+                    </form>
+                  </td>
+                </tr>
+                {% endif %}
+                {% if cart.item4 %}
+                <tr>
+                  <td class="text-center">{{ cart.item4.item_name }}</td>
+                  <td class="text-center" id="item-price">₹ {{ cart.item4.price }}</td>
+                  <td class="text-center">
+                    <form method="POST" action="{% url 'delete_cart_item' cart_id=cart.cartid item_number='item4'  %}">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-danger btn-sm">  <i class="fa fa-trash" aria-hidden="true"></i>  Delete</button>
+                    </form>
+                  </td>
+                </tr>
+                {% endif %}
+                {% if cart.item5 %}
+                <tr>
+                  <td class="text-center">{{ cart.item5.item_name }}</td>
+                  <td class="text-center" id="item-price">₹ {{ cart.item5.price }}</td>
+                  <td class="text-center">
+                    <form method="POST" action="{% url 'delete_cart_item' cart_id=cart.cartid item_number='item5'  %}">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-danger btn-sm">  <i class="fa fa-trash" aria-hidden="true"></i>  Delete</button>
+                    </form>
+                  </td>
+                </tr>
+                {% endif %}
+                {% if not cart.item1 and not cart.item2 and not cart.item3 and not cart.item4 and not cart.item5 %}
+                <tr>
+                  <td colspan="3" class="text-center">Cart is empty</td>
               </tr>
+              {% endif %}
               {% endfor %}
+            {% endif %}
             </tbody>
           </table>
-        </div>
+          </div>
+          
+          <div class="row" style="text-align: center;">
+            <div class="col-md-6 text-end">Cart Subtotal:</div>
+            <div class="col-md-6 text-center" id="cart-subtotal">₹ 0</div>
+          </div>
+          <div class="row" style="text-align: center;">
+            <div class="col-md-6 text-end">Sales Tax (5%):</div>
+            <div class="col-md-6 text-center" id="sales-tax">₹ 0</div>
+          </div>
+          <div class="row" style="font-weight: bold; text-align: center;">
+            <div class="col-md-6 text-end">Total Including Tax:</div>
+            <div class="col-md-6 text-center" id="total-including-tax">₹ 0</div>
+          </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <form method="POST" action="">
+          <form method="POST" action="{% url 'checkout_staff'  %}">
             {% csrf_token %}
+            <input type="hidden" name="total_amount" id="total_amount" value="">
             <button type="submit" class="btn btn-primary">Proceed to Pay</button>
           </form>
         </div>
@@ -261,7 +333,36 @@
         });
     });
 </script>
-
+<script>
+    function calculateCart() {
+      var cartSubtotal = 0;
+      var salesTax = 0;
+      var totalIncludingTax = 0;
+      var items = document.getElementsByClassName('text-center');
+      for (var i = 0; i < items.length; i++) {
+        if (items[i].innerHTML.includes('₹')) {
+          var itemPrice = parseFloat(items[i].innerHTML.replace('₹ ', ''));
+          cartSubtotal += itemPrice;
+        }
+      }
+      salesTax = 0.05 * cartSubtotal;
+      totalIncludingTax = cartSubtotal + salesTax;
+      document.getElementById('cart-subtotal').innerHTML = '₹ ' + cartSubtotal.toFixed(2);
+      document.getElementById('sales-tax').innerHTML = '₹ ' + salesTax.toFixed(2);
+      document.getElementById('total-including-tax').innerHTML = '₹ ' + totalIncludingTax.toFixed(2);
+    }
+    calculateCart();
+  </script>  
+  <script>
+    // get the total amount element
+    var totalElement = document.getElementById("total-including-tax");
+    // get the value of the total amount
+    var totalValue = totalElement.innerHTML;
+    // remove the currency symbol and convert to float
+    var totalAmount = parseFloat(totalValue.replace("₹ ", ""));
+    // set the value of the hidden input field
+    document.getElementById("total_amount").value = totalAmount;
+  </script>
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
