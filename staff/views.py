@@ -261,3 +261,50 @@ def receipt_staff(request, orderid):
         'items': items,
     }
     return render(request, 'receipt_staff.html', context)
+
+def order_history_staff(request):
+    order_type = request.POST.get('order_type') # get the order type from query parameter
+    if order_type == '1':
+        orders = Order.objects.filter(order_mode='online').order_by('-order_time')
+    elif order_type == '2':
+        orders = Order.objects.filter(order_mode='offline').order_by('-order_time')
+    elif order_type == '3':
+        orders = Order.objects.all().order_by('-order_time')
+    else:
+        orders = Order.objects.filter(order_mode='offline').order_by('-order_time')
+    
+    # Calculate number of items for each order
+    for order in orders:
+        student = Student.objects.get(pk=order.studentid_id )
+        order.student_name = student.first_name + ' ' + student.last_name
+        items = [order.item1, order.item2, order.item3, order.item4, order.item5]
+        order.num_items = sum(1 for item in items if item is not None)
+    context = {
+        'orders': orders,
+        'order_type': order_type,
+    }
+    
+    return render(request, 'order_history_staff.html', context)
+
+def reviews(request):
+    feedbacks = Feedback.objects.all().order_by('-submission_time')
+    total_reviews = feedbacks.count()
+    positive_reviews = feedbacks.filter(rating__gte=4).count()
+    neutral_reviews = feedbacks.filter(rating=3).count()
+    negative_reviews = feedbacks.filter(rating__lte=2).count()
+    
+    for feedback in feedbacks:
+        student = Student.objects.get(pk=feedback.studentid_id)
+        menu = MenuItem.objects.get(pk=feedback.itemid_id)
+        feedback.student_name = f'{student.first_name} {student.last_name}'
+        feedback.item_name = f'{menu.item_name}'
+    
+    context = {
+        'feedbacks': feedbacks,
+        'total_reviews': total_reviews,
+        'positive_reviews': positive_reviews,
+        'neutral_reviews': neutral_reviews,
+        'negative_reviews': negative_reviews,
+    }
+    
+    return render(request, 'reviews.html', context)

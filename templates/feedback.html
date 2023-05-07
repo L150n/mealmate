@@ -97,12 +97,12 @@
 
       <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
         <div class="navbar-nav ml-auto">
-          <a href="{% url 'index' %}" class="nav-item nav-link active">Home</a>
+          <a href="{% url 'index' %}" class="nav-item nav-link ">Home</a>
           <a href="{% url 'profile' %}" class="nav-item nav-link">Profile</a>
           <a href="{% url 'ewallet'%}" class="nav-item nav-link">E-Wallet</a>
           <a href="{% url 'menushowstudent' %}" class="nav-item nav-link">Order</a>
           <a href="{% url 'order_history_student' %}" class="nav-item nav-link">Order History</a>
-          <a href="{% url 'feedbackmenu' %}" class="nav-item nav-link">Feedback</a>
+          <a href="{% url 'feedbackmenu' %}" class="nav-item nav-link active">Feedback</a>
 
           <a href="{% url 'login' %}">
             <button type="button" class="btn btn-outline-dark">
@@ -137,68 +137,119 @@
     <div class="row">
       <div class="col-lg-10 mx-auto col-12 text-center mb-3">
         <h1 class="mt-0 text-black">Feedback</h1>
+
+          <!-- Button trigger modal -->
+          <button type="button" class="btn btn-primary cart-btn" data-toggle="modal" data-target="#feedbackModal">
+            <i class="fa fa-plus mr-1" aria-hidden="true"></i> Add Feedback
+          </button>
       </div>
       <div class="container">
         <hr class="accent my-6" style="border-width: 2px; border-style: dotted; width: 100%;">
-        <div class="row">
-          {% for item in items %}
-            <div class="col-md-6 mb-3">
-              <div class="card">
-                <div class="row g-0">
-                  <div class="col-md-4">
-                    <img src="{{ item.images.url }}" class="card-img-top" alt="{{ item.item_name }}" style="object-fit: cover;">
-                  </div>
-                  <div class="col-md-8">
-                    <div class="card-body">
-                      <h5 class="card-title">{{ item.item_name }}</h5>
-                      <p class="card-text">{{ item.description }}</p>
-                      <button class="btn btn-success add-to-cart-btn" data-toggle="modal" data-target="#feedback-modal-{{ item.menuid }}">
-                        Add feedback
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+        <div class="row justify-content-center">
+          {% for feedback in feedbacks %}
+          <div class="card" style="width: 900px;">
+            <div class="card-header">
+              <span class="float-right text-muted">{{ feedback.submission_time }}</span> Ordered Item :<b>
+              {{ feedback.itemid.item_name }}</b>
             </div>
-            <div class="modal fade" id="feedback-modal-{{ item.menuid }}" tabindex="-1" aria-labelledby="feedback-modal-label-{{ item.menuid }}" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <form method="POST" action="{% url 'add_feedback' item.menuid %}">
-                    {% csrf_token %}
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="feedback-modal-label-{{ item.menuid }}">Add Feedback</h5>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                    <div class="modal-body">
-                      <div class="form-group">
-                        <label for="comment-input">Comment:</label>
-                        <textarea class="form-control" id="comment-input" name="comment"></textarea>
-                      </div>
-                      <div class="form-group">
-                        <label for="rating-input">Rating:</label>
-                        <div class="star-rating">
-                          <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 stars"><i class="fa-solid fa-star"></i></label>
-                          <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars"><i class="fa-solid fa-star"></i></label>
-                          <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 stars"><i class="fa-solid fa-star"></i></label>
-                          <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars"><i class="fa-solid fa-star"></i></label>
-                          <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star"><i class="fa-solid fa-star"></i></label>
-                        </div>
-                      </div>
-                      
-                      <input type="hidden" id="menu-id-input" name="menu_id" value="{{ item.menuid }}">
-                      <input type="hidden" id="item-id-input" name="item_id" value="{{ item.id }}">
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                      <button type="submit" class="btn btn-primary">Submit</button>
-                    </div>
-                  </form>
-                </div>
-              </div>
+            <div class="card-body">
+              <h5 class="card-title"> Rating : 
+                <span class="stars" id="stars-{{ feedback.feedback_id }}"> </span>
+              </h5><br>
+              <p class="card-text"><em>"{{ feedback.comment }}"</em></p>
+              <a href="{% url 'remove_feedback' feedback.feedback_id %}" class="btn btn-danger float-right">Remove</a>
             </div>
-          {% endfor %}
+            <script>
+              var starsContainer = document.getElementById('stars-{{ feedback.feedback_id }}');
+              var rating = "{{ feedback.rating }}";
+              for (var i = 1; i <= 5; i++) {
+                var star = document.createElement('i');
+                star.classList.add('fa', 'fa-star');
+                if (i <= rating) {
+                  star.classList.add('text-warning');
+                } else {
+                  star.classList.add('text-muted');
+                }
+                starsContainer.appendChild(star);
+              }
+            </script>
+          </div>
+        {% endfor %}
+        
+        
+<!-- Modal -->
+<div class="modal fade" id="feedbackModal" tabindex="-1" role="dialog" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="feedbackModalLabel">Add Feedback</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{%url 'add_feedback' %}">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="itemSelect">Select Item :</label>
+            <select class="form-control" id="itemSelect" name="itemid">
+              <option value="">Select an Item</option>
+              {% for item in items %}
+              <option value="{{ item.menuid }}">{{ item.item_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="commentTextarea">Comment :</label>
+            <textarea class="form-control" id="commentTextarea" rows="3" name="comment"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="ratingSelect">Rating :</label>
+            <select class="form-control" id="ratingSelect" name="rating">
+              <option value="1">1 star</option>
+              <option value="2">2 stars</option>
+              <option value="3">3 stars</option>
+              <option value="4">4 stars</option>
+              <option value="5">5 stars</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <h2><span class="stars" id="stars-new"></span></h2>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  var starsContainer = document.getElementById('stars-new');
+  var rating = 0;
+  for (var i = 1; i <= 5; i++) {
+    var star = document.createElement('i');
+    star.classList.add('fa', 'fa-star');
+    star.setAttribute('data-rating', i);
+    star.addEventListener('click', function() {
+      rating = this.getAttribute('data-rating');
+      updateStars();
+    });
+    starsContainer.appendChild(star);
+  }
+  function updateStars() {
+    for (var i = 1; i <= 5; i++) {
+      var star = starsContainer.querySelector('[data-rating="' + i + '"]');
+      if (i <= rating) {
+        star.classList.add('text-warning');
+      } else {
+        star.classList.remove('text-warning');
+      }
+    }
+    document.querySelector('#ratingSelect').value = rating;
+  }
+</script>
         </div> 
     </div>
   </div>
@@ -206,29 +257,7 @@
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-  <script>
-const stars = document.querySelectorAll('.stars i');
-const ratingInput = document.getElementById('rating-input');
 
-// ---- ---- Stars ---- ---- //
-[...stars].reverse().forEach((star, index1) => {
-  star.addEventListener('click', () => {
-    [...stars].reverse().forEach((star, index2) => {
-      // ---- ---- Active Star ---- ---- //
-      if (index1 >= index2) {
-        star.classList.add('active');
-      } else {
-        star.classList.remove('active');
-      }
-    });
-    
-    // Set the value of rating input to the number of active stars
-    ratingInput.value = document.querySelectorAll('.stars i.active').length;
-  });
-});
-
-
-  </script>
   <!-- JavaScript Libraries -->
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>

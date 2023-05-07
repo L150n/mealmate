@@ -28,11 +28,12 @@ def login_view(request):
     return render(request,'login.html')
 
 def ewallet(request):
-    
     user_id = request.session.get('studentid')
     student = Student.objects.get(studentid=user_id)
-    context = {'student': student} 
-    return render(request,'ewallet.html',context)
+    transactions = student.transaction_set.all().order_by('-transaction_time')
+    context = {'student': student, 'transactions': transactions}
+    return render(request, 'ewallet.html', context)
+
 
 def add_fund(request):
     if request.method == 'POST':
@@ -453,28 +454,33 @@ def feedbackmenu(request):
         items += [order.item1, order.item2, order.item3, order.item4, order.item5]
     # remove duplicates
     items = list(set(filter(None, items)))
-    return render(request, 'feedback.html', {'items': items})
+    feedbacks = Feedback.objects.filter(studentid=student_id).order_by('-submission_time')
+    return render(request, 'feedback.html', {'feedbacks': feedbacks, 'items': items})
 
-def add_feedback(request, item_id):
+def remove_feedback(request, feedback_id):
+    feedback = get_object_or_404(Feedback, pk=feedback_id)
+    feedback.delete()
+    return redirect('/feedbackmenu/')  # redirect back to feedback menu after successful deletion
+
+def add_feedback(request):
     if request.method == 'POST':
-        comment = request.POST.get('comment')
-        rating = request.POST.get('rating')
         student_id = request.session.get('studentid')
-        item = MenuItem.objects.get(pk=item_id)
-        
-        # create a new Feedback object and save it
-        feedback = Feedback.objects.create(
-            studentid=Student.objects.get(pk=student_id),
-            itemid=item,
-            comment=comment,
-            rating=rating,
-            submission_time=timezone.now()
-        )
-        feedback.save()
-
-        return redirect('/feedbackmenu/')
+        student = Student.objects.get(pk=student_id)
+        item_id = request.POST.get('itemid')
+        rating = request.POST.get('rating')
+        comment = request.POST.get('comment')
+        if not all([item_id, rating]):
+            messages.error(request, 'Please select an item and rating.')
+        else:
+            item = MenuItem.objects.get(pk=item_id)
+            feedback = Feedback.objects.create(
+                studentid=student,
+                itemid=item,
+                rating=rating,
+                comment=comment,
+                submission_time=timezone.now()
+            )
+            messages.success(request, 'Feedback added successfully.')
+            return redirect('/feedbackmenu/')
     else:
-        # if request is not a POST request, render the feedback form
-        item = MenuItem.objects.get(pk=item_id)
-        context = {'item': item}
-        return render(request, 'feedback.html', context)
+        return render('/login_view/')

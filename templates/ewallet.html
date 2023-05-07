@@ -196,9 +196,9 @@
 
                 <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
                     <div class="navbar-nav ml-auto">
-                      <a href="{% url 'index' %}" class="nav-item nav-link active">Home</a>
+                      <a href="{% url 'index' %}" class="nav-item nav-link ">Home</a>
                         <a href="{% url 'profile' %}" class="nav-item nav-link">Profile</a>
-                        <a href="{% url 'ewallet'%}" class="nav-item nav-link">E-Wallet</a>
+                        <a href="{% url 'ewallet'%}" class="nav-item nav-link active">E-Wallet</a>
                         <a href="{% url 'menushowstudent' %}" class="nav-item nav-link">Order</a>
                       <a href="{% url 'order_history_student' %}" class="nav-item nav-link">Order History</a>
                       <a href="{% url 'feedbackmenu' %}" class="nav-item nav-link">Feedback</a>
@@ -385,10 +385,10 @@ amountInput.addEventListener('input', (event) => {
                 </tr>
               </thead>
               <tbody>
-                {% for transaction in student.transaction_set.all %}
+                {% for transaction in transactions%}
                 <tr>
                   <td>{{ transaction.transaction_id }}</td>
-                  <td>{{ transaction.transaction_time|date:"Y-m-d H:i:s" }}</td>
+                  <td>{{ transaction.transaction_time|date:"Y-m-d h:i A" }}</td>
                   <td class="{% if transaction.transaction_type == 'credit' %}text-success{% elif transaction.transaction_type == 'debit' %}text-danger{% endif %}">
                     {% if transaction.transaction_type == 'credit' %}+ {{ transaction.transaction_amount }}{% elif transaction.transaction_type == 'debit' %}- {{ transaction.transaction_amount }}{% endif %}
                   </td>                  
@@ -399,6 +399,7 @@ amountInput.addEventListener('input', (event) => {
                 </tr>
                 {% endfor %}
               </tbody>
+              
             </table>
             
           </div>

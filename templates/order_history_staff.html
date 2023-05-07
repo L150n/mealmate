@@ -55,7 +55,6 @@
 .cart-btn {
   float: right;
 }
-
   </style>
 </head>
 
@@ -70,13 +69,12 @@
 
       <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
         <div class="navbar-nav ml-auto">
-          <a href="{% url 'index' %}" class="nav-item nav-link ">Home</a>
-          <a href="{% url 'profile' %}" class="nav-item nav-link">Profile</a>
-          <a href="{% url 'ewallet'%}" class="nav-item nav-link">E-Wallet</a>
-          <a href="{% url 'menushowstudent' %}" class="nav-item nav-link">Order</a>
-          <a href="{% url 'order_history_student' %}" class="nav-item nav-link active">Order History</a>
-          <a href="{% url 'feedbackmenu' %}" class="nav-item nav-link">Feedback</a>
-
+          <a href="{% url 'indexstaff'  %}"  class="nav-item nav-link ">Home</a>
+          <a href="{% url 'menushow' %}" class="nav-item nav-link">Menu</a>
+          <a href="{% url 'order_staff' %}" class="nav-item nav-link ">Order</a>
+          <a href="{% url 'order_history_staff' %}" class="nav-item nav-link active">Order History</a>
+          <a href="menu.html" class="nav-item nav-link">Statistics</a>
+          <a href="booking.html" class="nav-item nav-link">Reviews</a>
           <a href="{% url 'login' %}">
             <button type="button" class="btn btn-outline-dark">
               <i class="fa fa-user mr-1" aria-hidden="true"></i> Logout
@@ -92,21 +90,36 @@
   <div class="container py-5">
     <div class="row">
       <div class="col-lg-10 mx-auto col-12 text-center mb-3">
-        <h1 class="mt-0 text-black">My Order History</h1>
+        <h1 class="mt-0 text-black">Order History</h1>
       </div>
-    </div>
+    </div> 
     <table class="table">
-      <hr class="accent my-5" style="border-width: 2px; border-style: dotted; width: 100%;">
+      <hr class="accent my-6" style="border-width: 2px; border-style: dotted; width: 100%;">
+      <div style="text-align:center;">
+        <form method="POST" action="{% url 'order_history_staff'%}" enctype="multipart/form-data">
+          {% csrf_token %}
+        <select name="order_type" class="select" style="text-align:center; width: 200px; height: 40px; font-size: 16px;">
+          <option value="">Choose Order Type</option>
+          <option value="1">Online</option>
+          <option value="2">Offline</option>
+          <option value="3">Both</option>
+        </select>
+        <input type="submit" value="Submit" style="background-color:white; border:1px solid black; height: 39px;">
+        </form>
+      </div>
+      
+      <br>
         <thead class="table-dark">
             <tr>
                 <th class="text-center">#</th>
                 <th class="text-center">Order ID</th>
                 <th class="text-center">Order Date & Time</th>
+                <th class="text-center">Student Admission No.</th>
+                <th class="text-center">Student Name</th>
                 <th class="text-center">No. of Items ordered</th>
                 <th class="text-center">Order Type</th>
                 <th class="text-center">Total Amount</th>
                 <th class="text-center">View Receipt</th>
-
             </tr>
         </thead>
         <tbody>
@@ -115,6 +128,8 @@
                 <td class="text-center">{{ forloop.counter }}</td>
                 <td class="text-center">{{ order.orderid }}</td>
                 <td class="text-center">{{ order.order_time|date:"m/d/Y h:i A" }}</td>
+                <td class="text-center">{{ order.studentid_id }}</td>
+                <td class="text-center">{{ order.student_name}}</td>
                 <td class="text-center">{{ order.num_items }}</td>
                 <td class="text-center">
                   {% if order.order_mode == 'online' %}
@@ -124,13 +139,12 @@
                   {% endif %}
               </td>
                 <td class="text-center">₹ {{ order.total_amount }}</td>
-                <td class="text-center">
-                  {% if order.order_mode == 'offline' %}
+                <td class="text-center">    
+                      {% if order.order_mode == 'offline' %}
                   <a href="{% url 'receipt_staff' order.orderid %}" target="_blank">View Receipt</a>
               {% else %}
                   <a href="{% url 'receipt' order.orderid %}" target="_blank">View Receipt</a>
               {% endif %}</td>
-                </td>
             </tr>
             {% endfor %}
         </tbody>
