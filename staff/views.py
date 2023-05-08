@@ -1,6 +1,9 @@
 
 from django.shortcuts import render,redirect, get_object_or_404
+from collections import defaultdict
 from accounts.models import *
+from django.db.models import *
+from django.db.models.functions import *
 from django.contrib import messages
 from django.http import JsonResponse,Http404
 from django.utils.html import format_html
@@ -308,3 +311,62 @@ def reviews(request):
     }
     
     return render(request, 'reviews.html', context)
+
+def stat(request):
+    total_menu_items = MenuItem.objects.count()
+    total_money_earned = Order.objects.aggregate(Sum('total_amount'))['total_amount__sum']
+    total_orders = Order.objects.count()
+    registered_students = Student.objects.count()
+    item_fields = ['item1', 'item2', 'item3', 'item4', 'item5']
+    item_counts = defaultdict(int)
+
+    # Count the total occurrences of each menu item
+    for field in item_fields:
+        for obj in Order.objects.filter(**{f'{field}__isnull': False}).values(field):
+            menu_item_id = obj[field]
+            item_counts[menu_item_id] += 1
+
+    # Fetch the MenuItem objects for each menu item and create a list of dicts
+    item_data = []
+    for menu_item_id, count in item_counts.items():
+        menu_item = MenuItem.objects.get(menuid=menu_item_id)
+        item_data.append({'item_name': menu_item.item_name, 'count': count})
+
+    # Count the total occurrences of each order mode
+    order_modes = Order.objects.values('order_mode').annotate(mode_count=Count('order_mode'))
+
+    # Create a list of dicts with the order mode data
+    order_mode_data = [{'mode': mode['order_mode'], 'count': mode['mode_count']} for mode in order_modes]
+    
+    # Query orders by week and count them
+    order_counts = {}
+    orders_by_week = Order.objects.annotate(week=ExtractWeek('order_time')).values('week').annotate(count=Count('orderid')).order_by('week')
+    for order in orders_by_week:
+        order_counts[order['week']] = order['count']
+
+    # Create lists for the line chart
+    weeks = list(order_counts.keys())
+    order_numbers = list(order_counts.values())
+    # Line chart data
+    line_chart_data = {
+        'labels': weeks,
+        'datasets': [{
+            'label': 'Order Numbers',
+            'data': order_numbers,
+            'fill': False,
+            'borderColor': 'rgb(75, 192, 192)',
+            'lineTension': 0.1
+        }]
+    }
+
+    context = {
+        'total_menu_items': total_menu_items,
+        'total_money_earned': total_money_earned,
+        'total_orders': total_orders,
+        'registered_students': registered_students,
+        'items': item_data,
+        'order_modes': order_mode_data,
+        'line_chart_data':line_chart_data
+    }
+
+    return render(request, 'stats.html', context)

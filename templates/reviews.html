@@ -61,8 +61,8 @@
           <a href="{% url 'menushow' }" class="nav-item nav-link">Menu</a>
           <a href="{% url 'order_staff' %}" class="nav-item nav-link">Order</a>
           <a href="{% url 'order_history_staff' %}" class="nav-item nav-link">Order History</a>
-          <a href="#" class="nav-item nav-link">Statistics</a>
-          <a href="#" class="nav-item nav-link active">Reviews</a>
+          <a href="{% url 'stat' %}" class="nav-item nav-link">Statistics</a>
+          <a href="{% url 'reviews' %}" class="nav-item nav-link active">Reviews</a>
           <a href="{% url 'login' %}">
             <button type="button" class="btn btn-outline-dark">
               <i class="fa fa-user mr-1" aria-hidden="true"></i> Logout
