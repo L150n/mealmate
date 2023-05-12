@@ -209,7 +209,7 @@ body {
                                 <div class="col-md-6">
                                     <div class="form-group">
                                           <label>Gender</label><br>
-                                        <select name="gender">
+                                        <select class="form-control" name="gender">
                                             <option value="M" {% if student.gender == "M" %}selected{% endif %}>Male</option>
                                             <option value="F" {% if student.gender == "F" %}selected{% endif %}>Female</option>
                                             <option value="O" {% if student.gender == "O" %}selected{% endif %}>Other</option>
@@ -248,13 +248,13 @@ body {
                                 <div class="col-md-6">
                                     <div class="form-group">
                                           <label>New password</label>
-                                          <input name="new_password" type="password" class="form-control">
+                                          <input name="new_password" type="password" class="form-control" pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                           <label>Confirm new password</label>
-                                          <input name="confirm_password" type="password" class="form-control">
+                                          <input name="confirm_password" type="password" class="form-control" pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$">
                                     </div>
                                 </div>
                             </div>
@@ -268,13 +268,13 @@ body {
                             <h3 class="mb-4">Facial Recognition Settings</h3>
                             
                                <!-- HTML code for the page -->
-                               <button id="start-btn">Start Webcam</button>
-                               <button id="stop-btn" disabled>Stop Webcam</button>
+                               <button id="start-btn" class="btn btn-success">Start Webcam</button>
+                               <button id="stop-btn" disabled class="btn btn-danger">Stop Webcam</button>
                                <video id="video-preview" width="640" height="480"></video>
                                <form id="image-form" action="{% url 'process_image' %}" method="post">
                                  {% csrf_token %}
                                  <input type="hidden" id="imagedata" name="imagedata">
-                                 <button id="capture-btn" disabled>Capture Image</button>
+                                 <button id="capture-btn" class="btn btn-primary" disabled><i class="fas fa-camera"></i> Capture Image</button>
                                </form>
                                
                     

@@ -1,6 +1,8 @@
 
 from django.shortcuts import render,redirect, get_object_or_404
 from collections import defaultdict
+from django.core.mail import send_mail
+from django.conf import settings
 from accounts.models import *
 from django.db.models import *
 from django.db.models.functions import *
@@ -180,8 +182,12 @@ def delete_cart_item(request, cart_id, item_number):
 def checkout_staff(request):
     if request.method == 'POST':
         # Get student information
+        menu_itemsall = MenuItem.objects.all()
         student = get_object_or_404(Student, pk=student_id)
         cart_items = Cart.objects.filter(studentid=student_id)
+        if not any(getattr(cart_item, f'item{num}') for num in range(1, 6) for cart_item in cart_items):
+            messages.error(request, 'The Cart is Empty!')
+            return render(request, 'order_staff.html', {'student': student , 'menu_items': menu_itemsall , 'carts':cart_items})
         total_amount = Decimal(request.POST.get('total_amount'))
     
                 # Check if student has enough balance
@@ -229,8 +235,57 @@ def checkout_staff(request):
 
         # Empty cart
         cart_items.delete()
-        return receipt_staff(request, order.orderid)
+        return receipt_staffwithemail(request, order.orderid)
+
+
+
+def receipt_staffwithemail(request, order_id):
+    order = Order.objects.get(pk=order_id)
     
+    items = []
+    for i in range(1, 6):
+        item_field = f"item{i}"
+        if getattr(order, item_field):
+            menu_item = MenuItem.objects.get(pk=getattr(order, item_field).menuid)
+            item_name = menu_item.item_name
+            item_price = menu_item.price
+            item_quantity = 1
+            
+            # Check if the item already exists in the list
+            for item in items:
+                if item['name'] == item_name:
+                    item['quantity'] += 1
+                    item['price'] += item_price
+                    item_quantity = item['quantity']
+                    break
+            
+            # If the item doesn't exist, add it to the list
+            else:
+                item = {
+                    'name': item_name,
+                    'price': item_price,
+                    'quantity': item_quantity,
+                }
+                items.append(item)
+    # Construct email message
+
+    # Format the datetime object as a string with the desired format
+    subject = 'Order Confirmation'
+    message = f"Dear {order.studentid.first_name},\n\nThis is to confirm that your order has been successfully placed at the canteen. Your order details are as follows:\n\nOrder ID: #{order.orderid}\nOrder Date and Time: {order.order_time} \nTotal Amount:₹ {order.total_amount}\n\nItems:\n"
+    for item in items:
+            message += f"{item['name']} - {item['quantity']} x {item['price']}\n"
+    message += "We appreciate your business and hope you enjoy your meal.\n\nThank you,\nCanteen Team."
+    from_email = settings.EMAIL_HOST_USER
+    recipient_list = [order.studentid.email]
+    send_mail(subject, message, from_email, recipient_list)
+    context = {
+        'order': order,
+        'items': items,
+    }
+    return render(request, 'receipt_staff.html', context)
+
+
+
 def receipt_staff(request, orderid):
     order = Order.objects.get(pk=orderid)
     

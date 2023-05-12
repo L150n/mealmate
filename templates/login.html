@@ -1,5 +1,21 @@
 <html>
 <head>
+	<!-- Font Awesome CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<!-- Font Awesome JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+
+	 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
 	<title> Login and Registration Form</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
@@ -100,7 +116,7 @@ input{
 	font-family:'Nunito',sans-serif;
 }
 
-button{
+button.site{
 	display:block;
 	margin:0 auto;
 	width:260px;
@@ -137,26 +153,7 @@ button{
 	color:red;
 }
 
-.social-media{
-	width:100%;
-	text-align:center;
-	margin-top:20px;
-}
 
-.social-media ul{
-	list-style:none;
-}
-
-.social-media ul li{
-	display:inline-block;
-	cursor:pointer;
-	margin:25px 15px;
-}
-
-.social-media img{
-	width:40px;
-    height:40px;
-}
 
 .sub-cont{
 	overflow:hidden;
@@ -337,29 +334,23 @@ opacity: 1;
 .cont .img-btn .m-in {
 opacity: 0;
 }
+div.row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  width: 50%;
+}
+
 	</style>
 	<link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800&display=swap" rel="stylesheet">
 </head>
+
 <body>
 	
 <div class="scroll-bg"></div>
 	<div class="cont">
-		<div class="messages">
-			{% if messages %}
-			  {% for msg in messages %}
-				<div class="alert alert-danger text-center" role="alert">
-				  <i class="glyphicon glyphicon-exclamation-sign"></i>{{ msg }}
-				</div>
-			  {% endfor %}
-			{% endif %}
-		  </div>
-		  
-		  <script>
-			setTimeout(function() {
-			  document.querySelector('.messages').style.display = 'none';
-			}, 5000);
-		  </script>
-		  
 		<form method="POST" action="{% url 'loginuser' %}">
 			{% csrf_token %} 
 		<div class="form sign-in">
@@ -372,18 +363,16 @@ opacity: 0;
             <span>Password</span>
             <input type="password" name="password" required>
 			</label>
-			<a href="home.html" class="my-link">
-
-			<button class="submit" type="submit">Sign In</button></a>
+			
+			<button class="submit site" type="submit">Sign In</button>
 			</form>
 			
-			<div class="social-media">
-				<ul>
-					<li><img src="https://pluspng.com/img-png/google-logo-png-open-2000.png"></li>
-					<li><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/F_icon.svg/1200px-F_icon.svg.png"> </li>
-					
-				</ul>
+			<div class="row" style="margin-top: 30px;">	
+				<a href="http://127.0.0.1:8000/admin/" class="btn btn-danger">
+					<i class="fa fa-user-secret"></i> Login as Admin
+				  </a>  
 			</div>
+			
 		</div>
 		
 		<div class="sub-cont">
@@ -408,26 +397,31 @@ opacity: 0;
 				<label>
 					<span>Admission Number</span>
 					<input type="text" name="studentid" id="studentid" class="input" required minlength="4" maxlength="4">
+					<span class="error-message"></span>
 				</label>
 				
 				<label>
 					<span>First Name</span>
 					<input type="text" name="first_name" id="first_name" required>
+					<span class="error-message"></span>
 				</label>
 				<label>
 					<span>Email</span>
 					<input type="email" name="email" id="email" required>
+					<span class="error-message"></span>
 				</label>
 				<label>
 					<span>Password</span>
-					<input type="password" name="password" id="confirm_password" required>
+					<input type="password" name="password" id="confirm_password" required pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$">
+					<span class="error-message"></span>
 				</label>
 				<label>
 					<span>Confirm Password</span>
-					<input type="password" name="confirm_password" id="confirm_password" required>
+					<input type="password" name="confirm_password" id="confirm_password" required pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$">
+					<span class="error-message"></span>
 				</label>
-				<button type="submit" class="submit">Sign Up Now</button>
-			</div>
+				<button type="submit" class="submit site">Sign Up Now</button>
+			</div>	
 			</form>
 		</div>
 	</div>
@@ -443,5 +437,11 @@ admissionNumberInput.addEventListener('input', (event) => {
 });
 
   </script>		
+
+  </script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@2.9.3/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"></script>
+  
 </body>
 </html>
