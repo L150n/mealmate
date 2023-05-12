@@ -1,4 +1,4 @@
-# mealmate
+# Meal Mate
 
 MealMate is an innovative solution for college canteens that aims to improve the efficiency of their payment systems. The project is built using Django, a popular web development framework in Python.
 The application has two main modules - student and canteen staff. The student module allows students to sign up, sign in, update their profile information, and update their password. Additionally, students can add their facial data by capturing their face image and add funds to their e-wallet. Students can view their transaction history and order history, add items to their cart, view their cart, and place an order by proceeding to checkout. To complete the payment process, the student will need to enter their password, and the amount will be withdrawn from their e-wallet. The student can view their receipt and download it. Additionally, students can provide feedback about the food items they ordered.
