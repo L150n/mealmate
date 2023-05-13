@@ -53,6 +53,14 @@ def add_fund(request):
         transaction_time=timezone.now()
             )
         transaction.save()
+        # Construct email message
+        subject = 'Money Added to Your Virtual Wallet'
+        message = f"Dear {student.first_name} {student.last_name},\n\nThis is to confirm that ₹ {float(amount)} has been added to your virtual wallet balance.\n\nThank you,\nCanteen Team."
+        from_email = settings.EMAIL_HOST_USER
+        recipient_list = [student.email]
+
+        # Send email
+        send_mail(subject, message, from_email, recipient_list)
         messages.success(request, format_html('Added <strong>₹{}</strong> to your virtual wallet balance.', amount))
         context = {'student': student} 
         return redirect('/ewallet/')
@@ -102,7 +110,8 @@ def loginuser(request):
             request.session['email'] = useremail
             return render(request, 'index_staff.html')
         else:
-            return HttpResponse("<script>alert('Invalid Email or Password');window.location='/login_view';</script>")
+            messages.error(request, 'Invalid Email or Password!')
+            return redirect('/login_view/')
 
 
    
@@ -126,14 +135,17 @@ def reg(request):
             return HttpResponse("<script>alert('All fields are Required');window.location='/login_view';</script>")
 
         if password != confirm_password:
-            return HttpResponse("<script>alert('Password don't match');window.location='/login_view';</script>")
+            messages.error(request,'Password and Confirm Password not Same!')
+            return redirect('/login_view/')
 
         # Check if student with the same ID or email already exists
         if Student.objects.filter(studentid=studentid).exists():
-            return HttpResponse("<script>alert('A student with the same ID already exists');window.location='/login_view';</script>")
+            messages.error(request,'A student with the same Admission number already exists!')
+            return redirect('/login_view/')
 
         if Student.objects.filter(email=email).exists():
-            return HttpResponse("<script>alert('A student with the same email already exists');window.location='/login_view';</script>")
+            messages.error(request,'A student with the same email already exists!')
+            return redirect('/login_view/')
             
 
         # Create a new student object and save it to the database
@@ -141,9 +153,8 @@ def reg(request):
         student.save()
 
         # Redirect to a success page or login page
-        return HttpResponse("<script>alert('Signup Completed');window.location='/login_view';</script>")
-
-
+        messages.success(request,'Signup Completed')
+        return redirect('/login_view/')
     else:
         return render(request, 'login.html')
 
@@ -395,7 +406,13 @@ def checkout(request):
         # Update student wallet balance
         student.virtual_wallet_balance -= total_amount
         student.save()
-
+        # Construct email message
+        subject = 'Money Deducted from Your Virtual Wallet'
+        message = f"Dear {student.first_name} {student.last_name},\n\nThis is to confirm that ₹{total_amount} has been deducted from your virtual wallet for your recent order at the canteen."
+        message += f"\nYour current virtual wallet balance is ₹{student.virtual_wallet_balance}\n\nThank you,\nCanteen Team."
+        from_email = settings.EMAIL_HOST_USER
+        recipient_list = [student.email]
+        send_mail(subject, message, from_email, recipient_list)
         # Empty cart
         cart_items.delete()
         return receiptwithemail(request, order.orderid)

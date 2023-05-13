@@ -268,8 +268,6 @@ button.site{
 	        transform:translate3d(640px,0, 0);
 }
 
-
-
 .img-btn{
 	overflow:hidden;
 	z-index:2;
@@ -343,6 +341,20 @@ div.row {
   width: 50%;
 }
 
+.alert-container {
+    background-color: #ffffff;
+    border-color: #000000;
+    color: #000000;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid;
+    border-radius: 4px;
+}
+.custom-error-message {
+    font-weight: bold;
+    font-size: 16px;
+}
+
 	</style>
 	<link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800&display=swap" rel="stylesheet">
 </head>
@@ -350,7 +362,23 @@ div.row {
 <body>
 	
 <div class="scroll-bg"></div>
-	<div class="cont">
+	<div class="cont">	
+		{% if messages %}
+		<div class="alert-container" role="alert" style="padding-left: 210px;">
+			{% for message in messages %}
+				<span {% if message.tags %} class="{% if message.tags == 'success' %}text-success{% elif message.tags == 'error' %}text-danger{% endif %} custom-error-message"{% endif %}>{{ message }}</span><br>
+			{% endfor %}
+		</div>
+				  
+        
+		<script>
+			setTimeout(function() {
+				document.querySelector('.alert-container').remove();
+			}, 2000);
+		</script>
+
+      {% endif %}
+
 		<form method="POST" action="{% url 'loginuser' %}">
 			{% csrf_token %} 
 		<div class="form sign-in">

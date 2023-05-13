@@ -184,12 +184,16 @@
                 </div>
             </div>
         
-        
-    </div> <br>
-    <hr class="hr hr-blurry" />
-    <br>
-    <h4>Most Ordered Items</h4>
+       
+    </div> 
+    <hr class="hr hr-blurry my-5" />
     <div class="row">
+    <br>
+    
+    <br>
+    <div class="col-md-6">
+    <h4>Most Ordered Items</h4>
+    
       <div id="items-data" style="display: none;">{{ items|json_script:"items-data" }}</div>
       <canvas id="barChart" width="500" height="400"></canvas>
       
@@ -245,9 +249,7 @@
           });
       </script>
     </div>
-    <br>
-    <hr class="hr hr-blurry" />
-    <br>
+    <div class="col-md-6">
     <h4>Order Mode</h4>
     <div class="row">
       <div id="order-data" style="display: none;">{{ order_modes|json_script:"order-data" }}</div>
@@ -316,77 +318,45 @@
       </script>
       
     </div>
-    <br>
-    <hr class="hr hr-blurry" />
-    <!-- <br>
-    <h4>Order Mode</h4>
-    <div class="row">
-      <div id="line-chart-data" style="display: none;">{{ line_chart_data|json_script:"line-chart-data" }}</div>
-      <canvas id="lineChart"></canvas>
-      
-      <script>
-          var lineChartData = JSON.parse(document.getElementById('line-chart-data').textContent);
-      
-          var ctxL = document.getElementById("lineChart").getContext('2d');
-          var myLineChart = new Chart(ctxL, {
-              type: 'line',
-              data: lineChartData,
-              options: {
-                  responsive: true,
-                  legend: {
-                      display: false
-                  },
-                  scales: {
-                      yAxes: [{
-                          ticks: {
-                              beginAtZero:true
-                          }
-                      }]
-                  }
-              }
-          });
-      </script>
-      
-      
-    </div>
-    <br>
-    <hr class="hr hr-blurry" /> -->
-  </div>
     
+   
+    </div>
+
+   
 </div>
+
+<hr class="hr hr-blurry my-5" />
 <script>
-  $(document).ready(function() {
-      animateValue('#menu-items', '{{ total_menu_items }}', 2000);
-      animateValue('#money-earned', '{{ total_money_earned }}', 2000);
-      animateValue('#total-orders', '{{ total_orders }}', 2000);
-      animateValue('#registered-students', '{{ registered_students }}', 2000);
-  });
-
-  function animateValue(id, endVal, duration) {
-    var startVal = 0;
-    var range = endVal - startVal;
-    var startTime = new Date().getTime();
-    var endTime = startTime + duration;
-
-    var interval = setInterval(function() {
-        var currentTime = new Date().getTime();
-        var remaining = Math.max((endTime - currentTime) / duration, 0);
-        var currentValue = endVal - (remaining * range);
-        if (id === '#money-earned') {
-            // format money value with rupee symbol and decimal points
-            $(id).text('₹' + currentValue.toFixed(2));
-        } else {
-            $(id).text(Math.ceil(currentValue));
-        }
-        if (currentValue == endVal) {
-            clearInterval(interval);
-        }
-    }, 1000 / 60);
-}
-
-</script>
-
-
+    $(document).ready(function() {
+        animateValue('#menu-items', '{{ total_menu_items }}', 2000);
+        animateValue('#money-earned', '{{ total_money_earned }}', 2000);
+        animateValue('#total-orders', '{{ total_orders }}', 2000);
+        animateValue('#registered-students', '{{ registered_students }}', 2000);
+    });
+  
+    function animateValue(id, endVal, duration) {
+      var startVal = 0;
+      var range = endVal - startVal;
+      var startTime = new Date().getTime();
+      var endTime = startTime + duration;
+  
+      var interval = setInterval(function() {
+          var currentTime = new Date().getTime();
+          var remaining = Math.max((endTime - currentTime) / duration, 0);
+          var currentValue = endVal - (remaining * range);
+          if (id === '#money-earned') {
+              // format money value with rupee symbol and decimal points
+              $(id).text('₹' + currentValue.toFixed(2));
+          } else {
+              $(id).text(Math.ceil(currentValue));
+          }
+          if (currentValue == endVal) {
+              clearInterval(interval);
+          }
+      }, 1000 / 60);
+  }
+  
+  </script>
 
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>

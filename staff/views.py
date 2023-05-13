@@ -233,6 +233,13 @@ def checkout_staff(request):
         student.virtual_wallet_balance -= total_amount
         student.save()
 
+        subject = 'Money Deducted from Your Virtual Wallet'
+        message = f"Dear {student.first_name} {student.last_name},\n\nThis is to confirm that ₹{total_amount} has been deducted from your virtual wallet for your recent order at the canteen."
+        message += f"\nYour current virtual wallet balance is ₹{student.virtual_wallet_balance}\n\nThank you,\nCanteen Team."
+        from_email = settings.EMAIL_HOST_USER
+        recipient_list = [student.email]
+        send_mail(subject, message, from_email, recipient_list)
+
         # Empty cart
         cart_items.delete()
         return receipt_staffwithemail(request, order.orderid)
