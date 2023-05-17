@@ -4,7 +4,7 @@
   <title>Receipt</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-  <script src="//raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+ 
 </head>
 <style>
 @import "compass/css3";
@@ -432,23 +432,21 @@ Purchase and see you soon</p>
     </div>
   </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 <script>
-	function downloadPDF(){
-		var element = document.getElementById('invoice');
-var opt = {
-  margin:       1,
-  filename:     'Receipt.pdf',
-  image:        { type: 'jpeg', quality: 0.98 },
-  html2canvas:  { scale: 2 },
-  jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-};
+  function downloadPDF() {
+    const element = document.getElementById('invoice');
+	const orderid = document.getElementById('orderid').innerText;
+    const opt = {
+      margin: 0.5,
+      filename: 'Reciept_' + orderid + '.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
 
-// New Promise-based usage:
-html2pdf().set(opt).from(element).save();
-
-// Old monolithic-style usage:
-html2pdf(element, opt);
-}
+    html2pdf().set(opt).from(element).save();
+  }
 </script>
 </body>
 </html>
