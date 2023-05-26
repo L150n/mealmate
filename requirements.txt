@@ -178,7 +178,10 @@ numpy==1.23.4
 oauthlib==3.1.0
 olefile==0.46
 opencv-python==4.6.0.66
+<<<<<<< HEAD
 Pillow==9.5.0
+=======
+>>>>>>> parent of 3f10fc7... made some improvements in the entire code
 opt-einsum==3.3.0
 optional-django==0.1.0
 oscrypto==1.3.0
@@ -339,4 +342,7 @@ zope.interface==6.0
 zorin-appearance==4.1
 zorin-connect==1.2
 zorin-exec-guard==1.5
+<<<<<<< HEAD
 
+=======
+>>>>>>> parent of 3f10fc7... made some improvements in the entire code
