@@ -80,10 +80,6 @@ draftjs-sanitizer==1.0.0
 duplicity==0.8.12.0
 entrypoints==0.3
 executing==1.1.1
-<<<<<<< HEAD
->>>>>>> parent of 3f10fc7... made some improvements in the entire code
-=======
->>>>>>> parent of 3f10fc7... made some improvements in the entire code
 face-recognition==1.3.0
 face-recognition-models==0.3.0
 Faker==2.0.5
@@ -182,12 +178,7 @@ numpy==1.23.4
 oauthlib==3.1.0
 olefile==0.46
 opencv-python==4.6.0.66
-<<<<<<< HEAD
-<<<<<<< HEAD
 Pillow==9.5.0
-=======
-=======
->>>>>>> parent of 3f10fc7... made some improvements in the entire code
 opt-einsum==3.3.0
 optional-django==0.1.0
 oscrypto==1.3.0
