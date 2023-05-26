@@ -1,20 +1,24 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.core.mail import send_mail
 from django.conf import settings
+from django.urls import reverse
 from .models import *
 from decimal import Decimal
 from django.contrib import messages
 from io import BytesIO
 from PIL import Image
+import numpy as np
 from django.utils.html import format_html
 import cv2
 from django.utils import timezone
 import base64
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import authenticate, login
 from django.contrib import messages
 import face_recognition
-from django.http import Http404
-from django.http import HttpResponse
+from django.http import JsonResponse,Http404
+from django.core.files.base import ContentFile
+from django.http import HttpResponse,HttpResponseRedirect
 
 # Create your views here.
 def profile(request):

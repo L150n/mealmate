@@ -242,8 +242,7 @@ def checkout_staff(request):
 
         # Empty cart
         cart_items.delete()
-        #if also need to generate email with receipt use receipt_staffwithemail(request, order_id)
-        return receipt_staff(request, order.orderid)
+        return receipt_staffwithemail(request, order.orderid)
 
 
 
